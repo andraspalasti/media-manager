@@ -17,7 +17,7 @@ export class MovieResponse {
 
 @ObjectType()
 export class MovieRequest {
-	@Field()
+	@Field({ nullable: true })
 	poster_path!: string;
 
 	@Field()

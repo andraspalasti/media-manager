@@ -7,17 +7,19 @@ import { ContextType } from "../types";
 export class MovieResolver {
 	@Query(() => [Movie])
 	async movies(@Ctx() { db }: ContextType) {
-		return await db.select("movie").from(Movie, "movie").getMany();
+		return await db.find(Movie, {});
 	}
 
-	@Mutation(() => Movie)
-	async addMovie(
-		@Arg("data", () => MovieInput) { torrentId, title, torrentName, size }: MovieInput,
-		@Ctx() { db }: ContextType
-	): Promise<Partial<Movie>> {
-		const { generatedMaps } = await await db.insert().into(Movie).values({ torrentId, title, torrentName, size }).execute();
-		return { ...generatedMaps[0], torrentId, torrentName, size, title };
-	}
+	// @Mutation(() => Movie)
+	// async addMovie(
+	// 	@Arg("data", () => MovieInput) { torrentId, title, torrentName, size }: MovieInput,
+	// 	@Ctx() { db }: ContextType
+	// ): Promise<Partial<Movie>> {
+	// 	const movie = new Movie(torrentId, );
+	// 	movie.
+	// 	// const { generatedMaps } = await await db.insert().into(Movie).values({ torrentId, title, torrentName, size }).execute();
+	// 	// return { ...generatedMaps[0], torrentId, torrentName, size, title };
+	// }
 }
 
 @InputType({ description: "New movie data" })

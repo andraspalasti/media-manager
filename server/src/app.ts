@@ -6,27 +6,17 @@ import express from "express";
 import { buildSchema } from "type-graphql";
 import { MovieResolver } from "./resolvers/movieResolver";
 import { ContextType } from "./types";
-import { createConnection } from "typeorm";
-import { Movie } from "./entities/movie";
+import { MovieRequestResolver } from "./resolvers/movieRequestResolver";
+import { MikroORM } from "@mikro-orm/core/MikroORM";
+import { ORMconfig } from "./mikro-orm.config";
 import { MovieGenre } from "./entities/movieGenre";
 import setup from "./setup";
-import { MovieRequestResolver } from "./resolvers/movieRequestResolver";
 
 (async () => {
-	const connection = await createConnection({
-		name: "media",
-		type: "mysql",
-		host: "localhost",
-		port: 3306,
-		username: "root",
-		password: "root",
-		database: "media",
-		synchronize: true,
-		logging: true,
-		entities: [Movie, MovieGenre],
-	});
-	if ((await connection.createQueryBuilder().select("genres").from(MovieGenre, "genres").getMany()).length === 0) {
-		await setup({ db: connection.createQueryBuilder() });
+	const orm = await MikroORM.init(ORMconfig);
+
+	if ((await orm.em.find(MovieGenre, {})).length === 0) {
+		await setup({ db: orm.em.fork() });
 	}
 
 	const schema = await buildSchema({
@@ -36,7 +26,7 @@ import { MovieRequestResolver } from "./resolvers/movieRequestResolver";
 	const server = new ApolloServer({
 		schema,
 		context: (): ContextType => {
-			return { db: connection.createQueryBuilder() };
+			return { db: orm.em.fork() };
 		},
 	});
 

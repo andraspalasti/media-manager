@@ -1,5 +1,5 @@
-import { SelectQueryBuilder } from "typeorm";
+import { EntityManager, IDatabaseDriver, Connection } from "@mikro-orm/core";
 
 export interface ContextType {
-	db: SelectQueryBuilder<any>;
+	db: EntityManager<IDatabaseDriver<Connection>>;
 }

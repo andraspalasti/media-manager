@@ -16,8 +16,10 @@ export class MovieRequestResolver {
 
 	@FieldResolver(() => [String])
 	async genres(@Root() { genre_ids }: MovieRequest, @Ctx() { db }: ContextType) {
-		const result = await db.select(["genres.name"]).from(MovieGenre, "genres").where("genres.id IN (:...genre_ids)", { genre_ids }).getMany();
-		console.log(result);
-		return result;
+		const result = await db.find(MovieGenre, { id: { $in: genre_ids } }, { fields: ["name"] });
+		const genres = result.map((genre) => {
+			return genre.name;
+		});
+		return genres;
 	}
 }
