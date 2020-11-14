@@ -6,8 +6,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "node dist/app.js",
-    "start:dev": "nodemon src/app.ts --exec ts-node src/app.ts",
-    "migrate": "ts-node src/migrate.ts"
+    "start:dev": "nodemon src/app.ts --exec ts-node src/app.ts"
   },
   "keywords": [],
   "author": "",

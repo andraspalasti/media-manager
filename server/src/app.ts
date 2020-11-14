@@ -10,6 +10,7 @@ import { MovieRequestResolver } from "./resolvers/movieRequestResolver";
 import { MikroORM } from "@mikro-orm/core/MikroORM";
 import { ORMconfig } from "./mikro-orm.config";
 import { MovieGenre } from "./entities/movieGenre";
+import cors from "cors";
 import setup from "./setup";
 
 (async () => {
@@ -31,6 +32,14 @@ import setup from "./setup";
 	});
 
 	const app = express();
+
+	const corsOptions = {
+		origin: true,
+		credentials: true,
+	};
+
+	app.use(cors(corsOptions));
+
 	server.applyMiddleware({ app });
 
 	app.listen({ port: 4000 }, () => console.log(`Server ready at http://localhost:4000${server.graphqlPath}`));

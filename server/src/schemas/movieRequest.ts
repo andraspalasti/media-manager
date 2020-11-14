@@ -26,7 +26,7 @@ export class MovieRequest {
 	@Field()
 	overview!: string;
 
-	@Field()
+	@Field({ nullable: true })
 	release_date!: string;
 
 	genre_ids!: number[];
