@@ -1,8 +1,7 @@
-import { Box, Button, Flex } from "@chakra-ui/core";
+import { Button, Flex } from "@chakra-ui/core";
 import React from "react";
-import MediaSearchBar from "./components/MediaSearchBar";
 import ThemeToggler from "./components/ThemeToggler";
-import TrendingMovies from "./components/TrendingMovies";
+import Home from "./pages/Home";
 
 function App() {
 	return (
@@ -16,12 +15,7 @@ function App() {
 				</Flex>
 			</header>
 			<main>
-				<Box maxW={["95%", "90%", "80%", "70%"]} ml="auto" mr="auto">
-					<Box mb={6}>
-						<MediaSearchBar />
-					</Box>
-					<TrendingMovies />
-				</Box>
+				<Home />
 			</main>
 		</>
 	);

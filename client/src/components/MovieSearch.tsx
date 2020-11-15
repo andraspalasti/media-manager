@@ -3,10 +3,6 @@ import { Text, Divider, Flex, Grid, Spinner } from "@chakra-ui/core";
 import React from "react";
 import MediaRow from "./MediaRow";
 
-interface MovieSearchProps {
-	title: string;
-}
-
 interface searchMovie {
 	searchMovie: {
 		results: Movie[];
@@ -39,7 +35,7 @@ const SEARCH_MOVIE = gql`
 	}
 `;
 
-export default function MovieSearch({ title }: MovieSearchProps) {
+export default function MovieSearch({ title }: { title: string }) {
 	const { loading, error, data } = useQuery<searchMovie>(SEARCH_MOVIE, {
 		variables: { title },
 	});
