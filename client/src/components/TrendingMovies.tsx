@@ -1,6 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { Alert, AlertDescription, AlertIcon, AlertTitle, Box, Divider, Flex, Heading, PseudoBox, Spinner, Text } from "@chakra-ui/core";
 import React from "react";
+import { useHistory } from "react-router-dom";
 import MediaCard from "./MediaCard";
 
 interface Movie {
@@ -13,6 +14,7 @@ interface Movie {
 }
 
 function TrendingMovies() {
+	const history = useHistory();
 	const { loading, error, data } = useQuery(TRENDING_MOVIES);
 	if (loading)
 		return (
@@ -54,7 +56,6 @@ function TrendingMovies() {
 							rounded="lg"
 							borderBottom="3px solid transparent"
 							_hover={{ cursor: "pointer", borderBottom: "3px solid", borderColor: "blue.300" }}
-							transform="translateZ(0)"
 							key={movie.id}
 						>
 							<Box>
@@ -64,7 +65,9 @@ function TrendingMovies() {
 									imgPath={movie.poster_path}
 									genres={movie.genres}
 									rating={movie.vote_average}
-									handleClick={(id, title) => console.log(id, title)}
+									handleClick={(id) => {
+										history.push(`/movies/${id}`);
+									}}
 								/>
 							</Box>
 						</PseudoBox>

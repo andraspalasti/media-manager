@@ -1,14 +1,16 @@
 import { useLazyQuery, gql } from "@apollo/client";
-import { Box, Collapse, Grid, Icon, Input, InputGroup, InputLeftElement, useColorMode } from "@chakra-ui/core";
+import { Box, Collapse, Grid, Icon, Input, InputGroup, InputLeftElement } from "@chakra-ui/core";
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import MediaRow from "./MediaRow";
 // import MovieSearch from "./MovieSearch";
 
 export default function MediaSearchBar() {
-	const { colorMode } = useColorMode();
+	const history = useHistory();
+	// const { colorMode } = useColorMode();
 	const [show, setShow] = useState(false);
 	const [title, setTitle] = useState("");
-	const backgrounds = { light: "white", dark: "gray.700" };
+	// const backgrounds = { light: "white", dark: "gray.700" };
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setTitle(e.target.value);
@@ -26,21 +28,23 @@ export default function MediaSearchBar() {
 	error && console.error(error);
 	data && console.log(data);
 	return (
-		<Box position="relative">
-			<InputGroup
-				rounded="lg"
-				zIndex={10}
-				onFocus={() => title && setShow(true)}
-				// onBlur={() => setShow(false)}
-			>
+		<Box width="100%" position="relative">
+			<InputGroup rounded="lg" zIndex={10} onFocus={() => title && setShow(true)} onBlur={() => setShow(false)}>
 				<InputLeftElement children={<Icon name="search" />} />
 				<Input rounded="lg" value={title} type="text" placeholder="Search for movie or tv-show" onChange={handleChange} />
 			</InputGroup>
 			<Box position="absolute" zIndex={9} width="100%">
-				<Collapse width="100%" shadow="0 10px 15px -3px rgba(0,0,0,0.4)" backgroundColor={backgrounds[colorMode]} rounded="lg" isOpen={show} p={3}>
+				<Collapse width="100%" shadow="0 10px 15px -3px rgba(0,0,0,0.4)" backgroundColor="gray.700" rounded="lg" isOpen={show} p={3}>
 					{loading && <Box>Searching for movies</Box>}
 					{movies?.length === 0 && <Box>No movies found</Box>}
-					<Grid templateColumns={{ base: "100%", md: "auto auto auto" }} columnGap={6} rowGap={3}>
+					<Grid
+						templateColumns={{ base: "100%", md: "auto auto auto" }}
+						maxH={{ base: "50vh", md: "70vh" }}
+						overflow="auto"
+						columnGap={6}
+						pr={2}
+						rowGap={3}
+					>
 						{movies &&
 							movies.slice(0, 8).map(({ id, genres, title, release_date, poster_path, vote_average }) => {
 								return (
@@ -52,6 +56,7 @@ export default function MediaSearchBar() {
 										rating={vote_average}
 										imagePath={poster_path}
 										title={title}
+										handleClick={(id) => history.push(`/movies/${id}`)}
 									/>
 								);
 							})}
@@ -61,58 +66,6 @@ export default function MediaSearchBar() {
 		</Box>
 	);
 }
-
-// function MovieSearch({ title }: { title: string }) {
-// 	const { loading, error, data } = useQuery<searchMovie>(SEARCH_MOVIE, {
-// 		variables: { title },
-// 	});
-
-// 	if (loading) {
-// 		return (
-// 			<Flex width="100%" justify="center">
-// 				<Spinner size="md" />
-// 			</Flex>
-// 		);
-// 	}
-// 	if (error) {
-// 		return <p>Error occured</p>;
-// 	}
-// 	const movies = data?.searchMovie.results.slice().sort((a, b) => b.popularity - a.popularity);
-// 	// movies?.sort((a, b) => a.popularity - b.popularity);
-// 	console.log(movies);
-
-// 	return (
-// 		<>
-// 			<Flex fontWeight="semibold" as="h3" fontSize="md" lineHeight="tight" isTruncated>
-// 				Movies
-// 				<Text ml={1} color="gray.400">
-// 					({movies?.length})
-// 				</Text>
-// 			</Flex>
-// 			<Divider borderColor="gray.400" />
-// 			<Grid templateColumns={{ base: "100%", md: "auto auto auto" }} columnGap={6} rowGap={3}>
-// 				{movies &&
-// 					movies.slice(0, 3).map(({ id, genres, title, release_date, poster_path, vote_average }) => {
-// 						return (
-// 							<MediaRow key={id} id={id} genres={genres} releaseDate={release_date} rating={vote_average} imagePath={poster_path} title={title} />
-// 						);
-// 					})}
-// 			</Grid>
-// 		</>
-// 	);
-// }
-
-// const debounce = (func: any, wait: number) => {
-// 	let timeout: any;
-// 	return function executedFunction(...args: any[]) {
-// 		const later = () => {
-// 			timeout = null;
-// 			func(...args);
-// 		};
-// 		clearTimeout(timeout);
-// 		timeout = setTimeout(later, wait);
-// 	};
-// };
 
 interface searchMovie {
 	searchMovie: {

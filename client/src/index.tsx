@@ -4,6 +4,7 @@ import React from "react";
 import { render } from "react-dom";
 import App from "./App";
 import "./css/App.css";
+import { BrowserRouter as Router } from "react-router-dom";
 
 const client = new ApolloClient({
 	uri: "http://192.168.1.37:4000/graphql",
@@ -16,7 +17,9 @@ render(
 		<ColorModeProvider>
 			<CSSReset />
 			<ApolloProvider client={client}>
-				<App />
+				<Router>
+					<App />
+				</Router>
 			</ApolloProvider>
 		</ColorModeProvider>
 	</ThemeProvider>,

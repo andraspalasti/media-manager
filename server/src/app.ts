@@ -12,6 +12,7 @@ import { ORMconfig } from "./mikro-orm.config";
 import { MovieGenre } from "./entities/movieGenre";
 import cors from "cors";
 import setup from "./setup";
+import { MovieDetailsResolver } from "./resolvers/movieDetailsResolver";
 
 (async () => {
 	const orm = await MikroORM.init(ORMconfig);
@@ -21,7 +22,7 @@ import setup from "./setup";
 	}
 
 	const schema = await buildSchema({
-		resolvers: [MovieResolver, MovieRequestResolver],
+		resolvers: [MovieResolver, MovieRequestResolver, MovieDetailsResolver],
 	});
 
 	const server = new ApolloServer({

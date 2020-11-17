@@ -1,4 +1,4 @@
-import { Skeleton, Image } from "@chakra-ui/core";
+import { Skeleton, Image, ImageProps } from "@chakra-ui/core";
 import React, { Component, createRef } from "react";
 
 interface Dimensions {
@@ -6,9 +6,14 @@ interface Dimensions {
 	height: number | undefined;
 }
 
-export default class LoadingImage extends Component<{ imagePath: string; sizes: number[] }, { isLoading: boolean; dimensions: Dimensions }> {
+export default class LoadingImage extends Component<
+	{ imagePath: string; sizes: number[]; style?: ImageProps },
+	{ isLoading: boolean; dimensions: Dimensions }
+> {
 	private container = createRef<HTMLDivElement>();
-	constructor(props: { imagePath: string; sizes: number[] } | Readonly<{ imagePath: string; sizes: number[] }>) {
+	constructor(
+		props: { imagePath: string; sizes: number[]; style?: ImageProps } | Readonly<{ imagePath: string; sizes: number[]; style?: ImageProps }>
+	) {
 		super(props);
 		this.state = { isLoading: false, dimensions: { width: undefined, height: undefined } };
 		this.props.sizes.sort((a, b) => a - b);
@@ -37,12 +42,10 @@ export default class LoadingImage extends Component<{ imagePath: string; sizes: 
 				<Skeleton width="100%" height="100%" rounded="md" isLoaded={this.state.isLoading}>
 					{size && this.props.imagePath && (
 						<Image
-							src={`https://image.tmdb.org/t/p/w${size}${this.props.imagePath}`}
+							src={`https://image.tmdb.org/t/p/${typeof size == "number" ? "w" : ""}${size}${this.props.imagePath}`}
 							onLoad={() => this.setState({ isLoading: true })}
-							// onLoad={() => this.loaded()}
-							mb={2}
-							rounded="md"
 							ignoreFallback
+							{...this.props.style}
 						/>
 					)}
 				</Skeleton>

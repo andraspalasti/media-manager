@@ -43,7 +43,7 @@ export class MovieRequest {
 	@Field()
 	title!: string;
 
-	@Field()
+	@Field({ nullable: true })
 	backdrop_path!: string;
 
 	@Field(() => Float)
