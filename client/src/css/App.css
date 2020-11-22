@@ -14,3 +14,8 @@
 ::-webkit-scrollbar-thumb:hover {
   opacity: 0.1;
 }
+@media (max-width: 768px) {
+  ::-webkit-scrollbar{
+    display: none;
+  }
+}

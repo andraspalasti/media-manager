@@ -1,10 +1,18 @@
-import { ColorModeProvider, CSSReset, ThemeProvider } from "@chakra-ui/core";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import React from "react";
 import { render } from "react-dom";
 import App from "./App";
 import "./css/App.css";
 import { BrowserRouter as Router } from "react-router-dom";
+
+const config = {
+	useSystemColorMode: false,
+	initialColorMode: "dark",
+};
+
+// 3. extend the theme
+const customTheme = extendTheme({ config });
 
 const client = new ApolloClient({
 	uri: "http://192.168.1.37:4000/graphql",
@@ -13,15 +21,13 @@ const client = new ApolloClient({
 
 const rootElement = document.getElementById("root");
 render(
-	<ThemeProvider>
-		<ColorModeProvider>
-			<CSSReset />
-			<ApolloProvider client={client}>
-				<Router>
-					<App />
-				</Router>
-			</ApolloProvider>
-		</ColorModeProvider>
-	</ThemeProvider>,
+	<ChakraProvider theme={customTheme}>
+		<ApolloProvider client={client}>
+			<Router>
+				{/* <ColorModeScript initialColorMode="dark" /> */}
+				<App />
+			</Router>
+		</ApolloProvider>
+	</ChakraProvider>,
 	rootElement
 );

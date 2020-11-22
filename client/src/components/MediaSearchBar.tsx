@@ -1,5 +1,6 @@
 import { useLazyQuery, gql } from "@apollo/client";
-import { Box, Collapse, Grid, Icon, Input, InputGroup, InputLeftElement } from "@chakra-ui/core";
+import { Box, Collapse, Grid, Input, InputGroup, InputLeftElement } from "@chakra-ui/react";
+import { SearchIcon } from "@chakra-ui/icons";
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import MediaRow from "./MediaRow";
@@ -30,37 +31,41 @@ export default function MediaSearchBar() {
 	return (
 		<Box width="100%" position="relative">
 			<InputGroup rounded="lg" zIndex={10} onFocus={() => title && setShow(true)} onBlur={() => setShow(false)}>
-				<InputLeftElement children={<Icon name="search" />} />
+				<InputLeftElement children={<SearchIcon />} />
 				<Input rounded="lg" value={title} type="text" placeholder="Search for movie or tv-show" onChange={handleChange} />
 			</InputGroup>
 			<Box position="absolute" zIndex={9} width="100%">
-				<Collapse width="100%" shadow="0 10px 15px -3px rgba(0,0,0,0.4)" backgroundColor="gray.700" rounded="lg" isOpen={show} p={3}>
-					{loading && <Box>Searching for movies</Box>}
-					{movies?.length === 0 && <Box>No movies found</Box>}
-					<Grid
-						templateColumns={{ base: "100%", md: "auto auto auto" }}
-						maxH={{ base: "50vh", md: "70vh" }}
-						overflow="auto"
-						columnGap={6}
-						pr={2}
-						rowGap={3}
-					>
-						{movies &&
-							movies.slice(0, 8).map(({ id, genres, title, release_date, poster_path, vote_average }) => {
-								return (
-									<MediaRow
-										key={id}
-										id={id}
-										genres={genres}
-										releaseDate={new Date(release_date)}
-										rating={vote_average}
-										imagePath={poster_path}
-										title={title}
-										handleClick={(id) => history.push(`/movies/${id}`)}
-									/>
-								);
-							})}
-					</Grid>
+				<Collapse in={show} animateOpacity>
+					<Box shadow="0 10px 15px -3px rgba(0,0,0,0.4)" transition="height ease-in-out 300ms" backgroundColor="gray.700" rounded="lg" p={3}>
+						{loading && <Box>Searching for movies</Box>}
+						{movies?.length === 0 && <Box>No movies found</Box>}
+						<Grid
+							templateColumns={{ base: "100%", md: "auto auto auto" }}
+							maxH={{ base: "50vh", md: "70vh" }}
+							overflow="auto"
+							columnGap={6}
+							pr={2}
+							rowGap={3}
+						>
+							{movies &&
+								movies.slice(0, 3).map(({ id, genres, title, release_date, poster_path, vote_average }) => {
+									console.log(typeof release_date);
+
+									return (
+										<MediaRow
+											key={id}
+											id={id}
+											genres={genres}
+											releaseDate={new Date(release_date.toString())}
+											rating={vote_average}
+											imagePath={poster_path}
+											title={title}
+											onClick={(id) => history.push(`/movies/${id}`)}
+										/>
+									);
+								})}
+						</Grid>
+					</Box>
 				</Collapse>
 			</Box>
 		</Box>

@@ -1,4 +1,4 @@
-import { Badge, Box, Button, Flex, Text } from "@chakra-ui/core";
+import { Badge, Box, Button, Flex, Text } from "@chakra-ui/react";
 import React from "react";
 import LoadingImage from "./LoadingImage";
 import Rating from "./Rating";
@@ -10,12 +10,14 @@ interface MediaRowProps {
 	genres: string[];
 	imagePath: string;
 	rating: number;
-	handleClick?: (id: number, title: string) => void;
+	onClick?: (id: number, title: string) => void;
 }
 
-export default function MediaRow({ id, title, releaseDate, imagePath, rating, genres, handleClick }: MediaRowProps) {
+export default function MediaRow({ id, title, releaseDate, imagePath, rating, genres, onClick }: MediaRowProps) {
+	console.log(releaseDate);
+
 	return (
-		<Button whiteSpace="normal" variant="outline" height={160} {...(handleClick && { onClick: () => handleClick(id, title) })}>
+		<Button whiteSpace="normal" variant="outline" height={160} {...(onClick && { onClick: () => onClick(id, title) })}>
 			<Flex position="relative" width="100%" overflow="hidden" rounded="lg" alignItems="center">
 				<Box height={138} width={92} flexShrink={0} rounded="lg" shadow="lg" overflow="hidden" mr={6}>
 					<LoadingImage imagePath={imagePath} sizes={[92, 154, 185, 342, 500, 780]} />
@@ -28,7 +30,7 @@ export default function MediaRow({ id, title, releaseDate, imagePath, rating, ge
 					<Flex mt={1} alignItems="center" flexWrap="wrap" alignContent="space-around" overflow="hidden">
 						{genres &&
 							genres.map((val) => (
-								<Badge variantColor="blue" key={val} p={1} mt={1} mr={2}>
+								<Badge colorScheme="blue" key={val} p={1} mt={1} mr={2}>
 									{val}
 								</Badge>
 							))}
@@ -37,7 +39,7 @@ export default function MediaRow({ id, title, releaseDate, imagePath, rating, ge
 						TV Show
 					</Badge> */}
 					<Text position="absolute" right={0} bottom={0} color="gray.400" ml={1}>
-						{releaseDate.getFullYear()}
+						{!isNaN(releaseDate.valueOf()) && releaseDate.getFullYear()}
 					</Text>
 				</Box>
 			</Flex>

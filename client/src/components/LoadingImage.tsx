@@ -1,4 +1,4 @@
-import { Skeleton, Image, ImageProps } from "@chakra-ui/core";
+import { Skeleton, Image, ImageProps } from "@chakra-ui/react";
 import React, { Component, createRef } from "react";
 
 interface Dimensions {
@@ -6,19 +6,24 @@ interface Dimensions {
 	height: number | undefined;
 }
 
-export default class LoadingImage extends Component<
-	{ imagePath: string; sizes: number[]; style?: ImageProps },
-	{ isLoading: boolean; dimensions: Dimensions }
-> {
+interface Props {
+	imagePath: string;
+	sizes: number[];
+	style?: ImageProps;
+}
+
+interface State {
+	isLoaded: boolean;
+	dimensions: Dimensions;
+}
+
+export default class LoadingImage extends Component<Props, State> {
 	private container = createRef<HTMLDivElement>();
-	constructor(
-		props: { imagePath: string; sizes: number[]; style?: ImageProps } | Readonly<{ imagePath: string; sizes: number[]; style?: ImageProps }>
-	) {
+	constructor(props: Props) {
 		super(props);
-		this.state = { isLoading: false, dimensions: { width: undefined, height: undefined } };
+		this.state = { isLoaded: false, dimensions: { width: undefined, height: undefined } };
 		this.props.sizes.sort((a, b) => a - b);
 	}
-
 	componentDidMount() {
 		this.setState({
 			dimensions: {
@@ -28,22 +33,16 @@ export default class LoadingImage extends Component<
 		});
 	}
 
-	loaded() {
-		console.log("loaded");
-	}
-
 	render() {
 		const width = this.state.dimensions.width || 0;
 		const size = this.props.sizes.find((size) => size > width) || "original";
-		// console.log(width);
-		// console.log("render");
 		return (
-			<div ref={this.container} style={{ height: "100%" }}>
-				<Skeleton width="100%" height="100%" rounded="md" isLoaded={this.state.isLoading}>
+			<div ref={this.container} style={{ height: "100%", width: "100%" }}>
+				<Skeleton width="100%" height="100%" rounded="md" isLoaded={this.state.isLoaded}>
 					{size && this.props.imagePath && (
 						<Image
 							src={`https://image.tmdb.org/t/p/${typeof size == "number" ? "w" : ""}${size}${this.props.imagePath}`}
-							onLoad={() => this.setState({ isLoading: true })}
+							onLoad={() => this.setState({ isLoaded: true })}
 							ignoreFallback
 							{...this.props.style}
 						/>

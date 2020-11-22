@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import { Alert, AlertDescription, AlertIcon, AlertTitle, Box, Divider, Flex, Heading, PseudoBox, Spinner, Text } from "@chakra-ui/core";
+import { Alert, AlertDescription, AlertIcon, AlertTitle, Box, Divider, Flex, Heading, Spinner, Text } from "@chakra-ui/react";
 import React from "react";
 import { useHistory } from "react-router-dom";
 import MediaCard from "./MediaCard";
@@ -25,7 +25,7 @@ function TrendingMovies() {
 	if (error)
 		return (
 			<Alert rounded="lg" status="error" variant="top-accent" flexDirection="column" p={3} justifyContent="center" textAlign="center">
-				<AlertIcon size="40px" mr={0} />
+				<AlertIcon w="40px" h="40px" mr={0} />
 				<AlertTitle mt={4} mb={1} fontSize="lg">
 					Ooops...
 				</AlertTitle>
@@ -43,11 +43,11 @@ function TrendingMovies() {
 					({results.length})
 				</Text>
 			</Heading>
-			<Divider borderColor="gray.300" />
+			<Divider borderColor="gray.300" mt={1} mb={2} />
 			<Flex overflowX="auto" height="auto" pb={2} style={{ gap: 14 }}>
 				{results.map((movie: Movie) => {
 					return (
-						<PseudoBox
+						<Box
 							width={{ base: 200, md: 240 }}
 							position="relative"
 							flexShrink={0}
@@ -57,20 +57,19 @@ function TrendingMovies() {
 							borderBottom="3px solid transparent"
 							_hover={{ cursor: "pointer", borderBottom: "3px solid", borderColor: "blue.300" }}
 							key={movie.id}
+							overflow="hidden"
 						>
-							<Box>
-								<MediaCard
-									id={movie.id}
-									title={movie.title}
-									imgPath={movie.poster_path}
-									genres={movie.genres}
-									rating={movie.vote_average}
-									handleClick={(id) => {
-										history.push(`/movies/${id}`);
-									}}
-								/>
-							</Box>
-						</PseudoBox>
+							<MediaCard
+								id={movie.id}
+								title={movie.title}
+								imgPath={movie.poster_path}
+								genres={movie.genres}
+								rating={movie.vote_average}
+								onClick={(id) => {
+									history.push(`/movies/${id}`);
+								}}
+							/>
+						</Box>
 					);
 				})}
 			</Flex>

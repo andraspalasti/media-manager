@@ -1,4 +1,5 @@
-import { Flex, Icon, Text } from "@chakra-ui/core";
+import { Flex, Text } from "@chakra-ui/react";
+import { StarIcon } from "@chakra-ui/icons";
 import React from "react";
 
 interface RatingProps {
@@ -11,9 +12,11 @@ export default function Rating(props: RatingProps) {
 		<Flex alignItems="center" flexWrap="nowrap" overflow="hidden">
 			{Array.apply(null, Array(5)).map((_, i) => {
 				return i < Math.round(rating / 2) ? (
-					<Icon name="star" color="orange.300" key={i} fontSize="sm" mr={1} />
+					<StarIcon color="orange.300" key={i} fontSize="sm" mr={1} />
 				) : (
-					<Icon name="star" stroke="orange.300" key={i} color="transparent" fontSize="sm" mr={1} />
+					// <Icon name="star" color="orange.300" key={i} fontSize="sm" mr={1} />
+					// <Icon name="star" stroke="orange.300" key={i} color="transparent" fontSize="sm" mr={1} />
+					<StarIcon stroke="orange.300" key={i} color="transparent" fontSize="sm" mr={1} />
 				);
 			})}
 
