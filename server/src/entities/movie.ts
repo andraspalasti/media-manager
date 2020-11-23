@@ -1,40 +1,40 @@
-import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
 import { Field } from "type-graphql/dist/decorators/Field";
 import { ObjectType } from "type-graphql/dist/decorators/ObjectType";
 import { ID, Int } from "type-graphql/dist/scalars/aliases";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @ObjectType()
 @Entity()
 export class Movie {
 	@Field((type) => ID)
-	@PrimaryKey()
+	@PrimaryColumn()
 	id!: number;
 
 	@Field()
-	@Property({ unique: true })
+	@Column({ unique: true })
 	torrentId?: string;
 
 	@Field()
-	@Property()
+	@Column()
 	title!: string;
 
 	@Field()
-	@Property()
+	@Column()
 	torrentName?: string;
 
 	@Field((type) => Int)
-	@Property()
+	@Column()
 	size?: number;
 
 	@Field()
-	@Property()
+	@Column()
 	addedAt: Date = new Date();
 
 	@Field({ nullable: true })
-	@Property({ nullable: true })
+	@Column({ nullable: true })
 	finishedAt?: Date;
 
 	@Field()
-	@Property({ default: false })
+	@Column({ default: false })
 	completed!: boolean;
 }

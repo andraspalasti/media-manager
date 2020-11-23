@@ -7,7 +7,7 @@ import { ContextType } from "../types";
 export class MovieResolver {
 	@Query(() => [Movie])
 	async movies(@Ctx() { db }: ContextType) {
-		return await db.find(Movie, {});
+		return await db.getRepository(Movie).find();
 	}
 
 	// @Mutation(() => Movie)

@@ -1,7 +1,7 @@
 import { Browser } from "puppeteer";
-import { EntityManager, IDatabaseDriver, Connection } from "@mikro-orm/core";
+import { Connection } from "typeorm";
 
 export interface ContextType {
-	db: EntityManager<IDatabaseDriver<Connection>>;
+	db: Connection;
 	browser: Browser;
 }

@@ -1,10 +1,9 @@
-import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
-
+import { Column, Entity, PrimaryColumn } from "typeorm";
 @Entity()
 export class MovieGenre {
-	@PrimaryKey()
+	@PrimaryColumn()
 	id!: number;
 
-	@Property()
+	@Column()
 	name!: string;
 }
