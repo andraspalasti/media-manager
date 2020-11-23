@@ -9,27 +9,27 @@ import { ContextType } from "./types";
 import { MovieRequestResolver } from "./resolvers/movieRequestResolver";
 import { MikroORM } from "@mikro-orm/core/MikroORM";
 import { ORMconfig } from "./mikro-orm.config";
-import { MovieGenre } from "./entities/movieGenre";
 import cors from "cors";
 import setup from "./setup";
 import { MovieDetailsResolver } from "./resolvers/movieDetailsResolver";
 import { VideoResolver } from "./resolvers/videoResolver";
+import puppeteer from "puppeteer";
+import { TorrentResolver } from "./resolvers/torrentResolver";
 
 (async () => {
 	const orm = await MikroORM.init(ORMconfig);
-
-	if ((await orm.em.find(MovieGenre, {})).length === 0) {
-		await setup({ db: orm.em.fork() });
-	}
+	const browser = await puppeteer.launch({ headless: process.env.NODE_ENV === "production" });
+	// if ((await orm.em.find(MovieGenre, {})).length === 0) {
+	await setup({ db: orm.em.fork(), browser: browser });
+	// }
 
 	const schema = await buildSchema({
-		resolvers: [MovieResolver, MovieRequestResolver, MovieDetailsResolver, VideoResolver],
+		resolvers: [MovieResolver, MovieRequestResolver, MovieDetailsResolver, VideoResolver, TorrentResolver],
 	});
-
 	const server = new ApolloServer({
 		schema,
-		context: (): ContextType => {
-			return { db: orm.em.fork() };
+		context: async (): Promise<ContextType> => {
+			return { db: orm.em.fork(), browser: browser };
 		},
 	});
 
