@@ -27,7 +27,7 @@ export default function Videos({ id, type }: { id: number; type: "movie" | "tv" 
 
 	return (
 		<Box mx="auto">
-			<Modal isCentered isOpen={isOpen} onClose={onClose} motionPreset="scale">
+			<Modal isCentered isOpen={isOpen} onClose={onClose} size="4xl" motionPreset="scale">
 				<ModalOverlay />
 				<ModalContent>
 					<Box position="relative" pb="56.25%" height={0}>

@@ -17,6 +17,8 @@ export default async function ({ db, browser }: ContextType) {
 	// Signing in and navigating to downloads page
 	await page.type("input#loginform_username", userName);
 	await page.type("input#loginform_password", password);
-	// await page.click("#loginform_submit");
-	// await page.waitForSelector("div#logoholderdiv");
+	await page.click("#loginform > table > tbody > tr:nth-child(3) > td:nth-child(2) > input[type=checkbox]");
+	await page.click("#loginform_submit");
+	await page.waitForSelector("div#logoholderdiv");
+	await page.close();
 }

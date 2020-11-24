@@ -16,32 +16,13 @@ export class MovieRequestResolver {
 
 	@FieldResolver(() => [String])
 	async genres(@Root() { genre_ids }: MovieRequest, @Ctx() { db }: ContextType) {
-		const result = await db.getRepository(MovieGenre).find({ cache: 30000, order: { id: "ASC" } });
-		const genres: String[] = [];
-		genre_ids.forEach((id) => {
-			const genre = binarySearchGenres(result, id);
-			if (genre !== "-1") {
-				genres.push(genre);
-			}
-		});
+		const result = await db.getRepository(MovieGenre).find({ where: { id: In(genre_ids) }, cache: 30000 });
+		const genres = result.map((genre) => genre.name);
 		return genres;
 	}
 
 	@Query(() => MovieResponse)
 	async trendingMovies() {
 		return await fetch(`${process.env.BASE_URL}/trending/movie/week?api_key=${process.env.API_KEY}`).then((response) => response.json());
-	}
-}
-
-function binarySearchGenres(arr: MovieGenre[], id: number): string {
-	var mid = Math.floor(arr.length / 2);
-	if (arr[mid].id === id) {
-		return arr[mid].name;
-	} else if (arr[mid].id < id && arr.length > 1) {
-		return binarySearchGenres(arr.splice(mid, Number.MAX_VALUE), id);
-	} else if (arr[mid].id > id && arr.length > 1) {
-		return binarySearchGenres(arr.splice(0, mid), id);
-	} else {
-		return "-1";
 	}
 }
