@@ -1,27 +1,55 @@
-import { gql, useQuery } from "@apollo/client";
-import { Box, Center, Flex, Text, Image, Spinner, Modal, ModalOverlay, useDisclosure, ModalContent } from "@chakra-ui/react";
+import {
+	Box,
+	Center,
+	Flex,
+	Text,
+	Image,
+	Spinner,
+	Modal,
+	ModalOverlay,
+	useDisclosure,
+	ModalContent,
+	Alert,
+	AlertDescription,
+	AlertIcon,
+	AlertTitle,
+} from "@chakra-ui/react";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import React, { useState } from "react";
+import { useVideosQuery } from "../generated/graphql";
 
-export default function Videos({ id, type }: { id: number; type: "movie" | "tv" }) {
-	const { loading, error, data } = useQuery(GET_VIDEOS, {
-		variables: { id: Number(id), type },
-	});
+interface VideosProps {
+	id: string;
+	type: "movie" | "tv";
+}
+
+export const Videos: React.FC<VideosProps> = ({ id, type }) => {
+	const [{ fetching, error, data }] = useVideosQuery({ variables: { id: id, type } });
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [selectedVideo, selectVideo] = useState("");
 
-	if (loading)
+	if (fetching)
 		return (
-			<Center width="100%">
+			<Center height="100%" width="100%">
 				<Spinner size="xl" />
 			</Center>
 		);
+
 	if (error) {
 		console.error(error);
-		return <div>No videos found</div>;
+		return (
+			<Alert rounded="lg" status="error" variant="top-accent" flexDirection="column" p={3} justifyContent="center" textAlign="center">
+				<AlertIcon w="40px" h="40px" mr={0} />
+				<AlertTitle mt={4} mb={1} fontSize="lg">
+					Ooops...
+				</AlertTitle>
+				<AlertDescription maxWidth="sm">No videos found</AlertDescription>
+			</Alert>
+		);
 	}
-	const videos: Video[] = data.getVideos?.results.filter(({ site }: Video) => site === "YouTube");
-	if (videos.length === 0) {
+
+	const videos = data?.getVideos?.results.filter(({ site }: any) => site === "YouTube");
+	if (!videos) {
 		<Center width="100%">No videos found</Center>;
 	}
 
@@ -42,27 +70,34 @@ export default function Videos({ id, type }: { id: number; type: "movie" | "tv" 
 				</ModalContent>
 			</Modal>
 			<Flex wrap="wrap" justifyContent="flex-start">
-				{videos.map(({ key, name, site, type }) => {
-					return (
-						<VideoElement
-							key={key}
-							id={key}
-							name={name}
-							site={site}
-							type={type}
-							onClick={(id) => {
-								onOpen();
-								selectVideo(id);
-							}}
-						/>
-					);
-				})}
+				{videos &&
+					videos.map(({ key, name, site, type }: any) => {
+						return (
+							<VideoElement
+								key={key}
+								id={key}
+								name={name}
+								type={type}
+								onClick={(id) => {
+									onOpen();
+									selectVideo(id);
+								}}
+							/>
+						);
+					})}
 			</Flex>
 		</Box>
 	);
+};
+
+interface VideoElementProps {
+	id: string;
+	name: string;
+	type: string;
+	onClick?: (id: string) => void;
 }
 
-function VideoElement({ id, name, site, type, onClick }: Props) {
+const VideoElement: React.FC<VideoElementProps> = ({ id, name, type, onClick }) => {
 	const [mouseOver, handleMouseOver] = useState(false);
 	return (
 		<Box
@@ -89,7 +124,7 @@ function VideoElement({ id, name, site, type, onClick }: Props) {
 				>
 					<ChevronRightIcon w={10} h={10} rounded="full" border="2px solid" color="gray.300" />
 				</Flex>
-				<Image minW={0} minH={0} src={`https://img.youtube.com/vi/${id}/mqdefault.jpg`} />
+				<Image minW={0} mx="auto" minH={0} src={`https://img.youtube.com/vi/${id}/mqdefault.jpg`} />
 			</Box>
 			<Text fontSize="lg" fontWeight={500} color="gray.300" isTruncated>
 				{name}
@@ -97,33 +132,4 @@ function VideoElement({ id, name, site, type, onClick }: Props) {
 			<Text color="gray.500">{type}</Text>
 		</Box>
 	);
-}
-
-const GET_VIDEOS = gql`
-	query getVideos($id: Float!, $type: String!) {
-		getVideos(id: $id, type: $type) {
-			id
-			results {
-				name
-				key
-				site
-				type
-			}
-		}
-	}
-`;
-
-interface Props {
-	id: string;
-	name: string;
-	site: string;
-	type: string;
-	onClick?: (id: string) => void;
-}
-
-interface Video {
-	key: string;
-	name: string;
-	site: string;
-	type: string;
-}
+};

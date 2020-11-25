@@ -1,0 +1,11 @@
+query videos($id: String!, $type: String!) {
+  getVideos(id: $id, type: $type) {
+    id
+    results {
+      name
+      key
+      site
+      type
+    }
+  }
+}

@@ -3,15 +3,14 @@ import { StarIcon } from "@chakra-ui/icons";
 import React from "react";
 
 interface RatingProps {
-	rating: number;
+	rating: number | undefined;
 }
 
-export default function Rating(props: RatingProps) {
-	const { rating } = props;
+export const Rating: React.FC<RatingProps> = ({ rating }) => {
 	return (
 		<Flex alignItems="center" flexWrap="nowrap" overflow="hidden">
 			{Array.apply(null, Array(5)).map((_, i) => {
-				return i < Math.round(rating / 2) ? (
+				return i < Math.round((rating || 0) / 2) ? (
 					<StarIcon color="orange.300" key={i} fontSize="sm" mr={1} />
 				) : (
 					// <Icon name="star" color="orange.300" key={i} fontSize="sm" mr={1} />
@@ -25,4 +24,4 @@ export default function Rating(props: RatingProps) {
 			</Text>
 		</Flex>
 	);
-}
+};

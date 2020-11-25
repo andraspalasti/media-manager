@@ -5,6 +5,9 @@
 /.pnp
 .pnp.js
 
+# graphql codegen
+/src/generated
+
 # testing
 /coverage
 

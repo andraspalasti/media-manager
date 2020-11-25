@@ -1,0 +1,13 @@
+query searchMovie($title: String!) {
+		searchMovie(title: $title) {
+			results {
+				id
+				title
+				genres
+				release_date
+				popularity
+				vote_average
+				poster_path
+			}
+		}
+	}

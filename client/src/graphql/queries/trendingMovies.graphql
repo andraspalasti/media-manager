@@ -1,0 +1,11 @@
+query trendingMovies {
+  trendingMovies {
+    results {
+      id
+      poster_path
+      title
+      vote_average
+      genres
+    }
+  }
+}

@@ -1,7 +1,7 @@
 import { Box, Flex, Badge } from "@chakra-ui/react";
 import React, { useState } from "react";
-import LoadingImage from "./LoadingImage";
-import Rating from "./Rating";
+import { LoadingImage } from "./LoadingImage";
+import { Rating } from "./Rating";
 
 interface MediaCardProps {
 	id: number;
@@ -25,7 +25,7 @@ function MediaCard({ id, title, imgPath, genres, rating, onClick }: MediaCardPro
 			{...(onClick && { onClick: () => onClick(id, title) })}
 		>
 			<Box width="100%" height={{ base: 300, md: 350 }}>
-				<LoadingImage imagePath={imgPath || ""} style={{ rounded: "md", overflow: "hidden" }} sizes={[92, 154, 185, 342, 500, 780]} />
+				<LoadingImage imagePath={imgPath || ""} sizes={[92, 154, 185, 342, 500, 780]} />
 			</Box>
 			<Box
 				position="absolute"

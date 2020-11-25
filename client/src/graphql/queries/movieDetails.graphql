@@ -1,0 +1,25 @@
+query movieDetails($id: String!) {
+  movieDetails(id: $id) {
+    id
+    title
+    poster_path
+    overview
+    release_date
+    vote_average
+    backdrop_path
+    revenue
+    budget
+    runtime
+    status
+    spoken_languages {
+      name
+    }
+    production_companies {
+      name
+    }
+    tagline
+    genres {
+      name
+    }
+  }
+}

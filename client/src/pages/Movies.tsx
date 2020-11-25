@@ -1,31 +1,59 @@
-import { gql, useQuery } from "@apollo/client";
-import { Box, Divider, Flex, Grid, Heading, Spinner, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react";
+import {
+	Alert,
+	AlertDescription,
+	AlertIcon,
+	AlertTitle,
+	Box,
+	Center,
+	Divider,
+	Flex,
+	Grid,
+	Heading,
+	Spinner,
+	Tab,
+	TabList,
+	TabPanel,
+	TabPanels,
+	Tabs,
+	Text,
+} from "@chakra-ui/react";
 import React from "react";
 import { useParams } from "react-router-dom";
-import LoadingImage from "../components/LoadingImage";
-import Rating from "../components/Rating";
-import Videos from "../components/Videos";
+import { LoadingImage } from "../components/LoadingImage";
+import { Rating } from "../components/Rating";
+import { Videos } from "../components/Videos";
+import { useMovieDetailsQuery } from "../generated/graphql";
 
 function Movies() {
-	const { movieId }: { movieId: string | undefined } = useParams();
+	const { movieId }: { movieId: string } = useParams();
 
-	const { loading, error, data } = useQuery(MOVIE_DETAILS, { variables: { id: Number(movieId) } });
-	if (loading) {
+	const [{ fetching, error, data }] = useMovieDetailsQuery({ variables: { id: movieId } });
+	if (fetching) {
 		return (
-			<Flex justifyContent="center" width="100%" m="auto" height="100vh" alignItems="center" size="xs">
+			<Center width="100%" height="100vh" size="xs">
 				<Spinner size="xl" />
-			</Flex>
+			</Center>
 		);
 	}
-	error && console.error(error);
+	if (error) {
+		return (
+			<Alert rounded="lg" status="error" variant="top-accent" flexDirection="column" p={3} justifyContent="center" textAlign="center">
+				<AlertIcon w="40px" h="40px" mr={0} />
+				<AlertTitle mt={4} mb={1} fontSize="lg">
+					Ooops...
+				</AlertTitle>
+				<AlertDescription maxWidth="sm">There was an error with the requested data.</AlertDescription>
+			</Alert>
+		);
+	}
 
-	const movie: MovieDetails = data.getMovieDetails;
-	const runtime = new Date(0, 0, 0, 0, movie.runtime || 0);
+	const movie = data?.movieDetails;
+	const runtime = new Date(0, 0, 0, 0, movie?.runtime || 0);
 	return (
 		<Box width="100%" mx="auto">
 			<Box position="relative" d={{ base: "block", md: "grid" }} gridTemplateColumns="repeat(8, minmax(0, 1fr))" alignItems="center" width="100%">
 				<Box gridRow={1} gridColumn="4 / 10" width="100%">
-					<LoadingImage imagePath={movie.backdrop_path} style={{ ml: "auto" }} sizes={[300, 780, 1280]} />
+					<LoadingImage imagePath={movie?.backdrop_path || ""} style={{ ml: "auto" }} sizes={[300, 780, 1280]} />
 				</Box>
 				<Box
 					position="relative"
@@ -44,22 +72,22 @@ function Movies() {
 					>
 						<Box mx={3}>
 							<Text fontSize={{ base: "4xl", md: "5xl" }} lineHeight="1.2em">
-								{movie.title}
+								{movie?.title}
 							</Text>
 							<Flex mt={1} color="gray.400">
 								<Box mr={4}>
-									<Rating rating={movie.vote_average} />
+									<Rating rating={movie?.vote_average} />
 								</Box>
-								<Text mr={4}>{new Date(movie.release_date).getFullYear()}</Text>
+								<Text mr={4}>{movie?.release_date && new Date(movie.release_date).getFullYear()}</Text>
 								<Text mr={4} isTruncated>
 									{runtime.getHours() ? `${runtime.getHours()}h` : ""} {runtime.getMinutes() ? `${runtime.getMinutes()}min` : ""}
 								</Text>
 							</Flex>
 							<Text mb={4} color="gray.400">
-								{movie.genres.map(({ name }) => name).join(" | ")}
+								{movie?.genres.map(({ name }: any) => name).join(" | ")}
 							</Text>
 							<Text display={{ base: "none", md: "-webkit-box" }} noOfLines={{ md: 3 }}>
-								{movie.overview}
+								{movie?.overview}
 							</Text>
 						</Box>
 					</Box>
@@ -89,14 +117,14 @@ function Movies() {
 						<TabPanel textAlign="start">
 							<Flex style={{ gap: "3em" }} mt={5}>
 								<Box display={{ base: "none", lg: "block" }} minWidth="30%" rounded="lg" overflow="hidden">
-									<LoadingImage imagePath={movie.poster_path} sizes={[92, 154, 185, 342, 500, 780]} />
+									<LoadingImage imagePath={movie?.poster_path} sizes={[92, 154, 185, 342, 500, 780]} />
 								</Box>
 								<Box alignSelf="end">
 									<Heading size="lg" fontWeight={400}>
 										Storyline
 									</Heading>
-									<Text mt={4}>{movie.overview}</Text>
-									<Text mt={3}>{movie.tagline}</Text>
+									<Text mt={4}>{movie?.overview}</Text>
+									<Text mt={3}>{movie?.tagline}</Text>
 									<Grid
 										mt={6}
 										templateColumns="min-content auto"
@@ -106,30 +134,28 @@ function Movies() {
 										templateRows="repeat(9, auto)"
 									>
 										<Text>Released</Text>
-										<Text>{movie.release_date}</Text>
+										<Text>{movie?.release_date}</Text>
 										<Text>Runtime</Text>
 										<Text>
 											{runtime.getHours() ? `${runtime.getHours()}h` : ""} {runtime.getMinutes() ? `${runtime.getMinutes()}min` : ""}
 										</Text>
 										<Text>Budget</Text>
-										<Text>{formatter.format(movie.budget)}</Text>
+										<Text>{formatter.format(movie?.budget || 0)}</Text>
 										<Text>Revenue</Text>
-										<Text>{formatter.format(movie.revenue)}</Text>
+										<Text>{formatter.format(movie?.revenue || 0)}</Text>
 										<Text>Genre</Text>
-										<Text>{movie.genres.map(({ name }) => name).join(", ")}</Text>
+										<Text>{movie?.genres.map(({ name }: any) => name).join(", ")}</Text>
 										<Text>Status</Text>
-										<Text>{movie.status}</Text>
+										<Text>{movie?.status}</Text>
 										<Text>Languages</Text>
-										<Text>{movie.spoken_languages.map(({ name }) => name).join(", ")}</Text>
+										<Text>{movie?.spoken_languages.map(({ name }: any) => name).join(", ")}</Text>
 										<Text>Production</Text>
-										<Text>{movie.production_companies.map(({ name }) => name).join(", ")}</Text>
+										<Text>{movie?.production_companies.map(({ name }: any) => name).join(", ")}</Text>
 									</Grid>
 								</Box>
 							</Flex>
 						</TabPanel>
-						<TabPanel>
-							<Videos id={movie.id} type="movie" />
-						</TabPanel>
+						<TabPanel>{movie?.id && <Videos id={movie?.id} type="movie" />}</TabPanel>
 						<TabPanel>
 							<p>three!</p>
 						</TabPanel>
@@ -147,68 +173,68 @@ const formatter = new Intl.NumberFormat("en-US", {
 	minimumFractionDigits: 0,
 });
 
-const MOVIE_DETAILS = gql`
-	query getMovieDetails($id: Float!) {
-		getMovieDetails(id: $id) {
-			id
-			title
-			poster_path
-			overview
-			release_date
-			vote_average
-			backdrop_path
-			revenue
-			budget
-			runtime
-			status
-			spoken_languages {
-				name
-			}
-			production_companies {
-				name
-			}
-			tagline
-			genres {
-				name
-			}
-		}
-	}
-`;
+// const MOVIE_DETAILS = `
+// 	query getMovieDetails($id: Float!) {
+// 		getMovieDetails(id: $id) {
+// 			id
+// 			title
+// 			poster_path
+// 			overview
+// 			release_date
+// 			vote_average
+// 			backdrop_path
+// 			revenue
+// 			budget
+// 			runtime
+// 			status
+// 			spoken_languages {
+// 				name
+// 			}
+// 			production_companies {
+// 				name
+// 			}
+// 			tagline
+// 			genres {
+// 				name
+// 			}
+// 		}
+// 	}
+// `;
 
-interface MovieDetails {
-	poster_path: string;
-	overview: string;
-	release_date: string;
-	id: number;
-	title: string;
-	backdrop_path: string;
-	popularity: number;
-	vote_average: number;
-	revenue: number;
-	genres: Genre[];
-	budget: number;
-	spoken_languages: Spoken_language[];
-	production_companies: Production_company[];
-	runtime: number | null;
-	status: string;
-	tagline: string | null;
-}
+// interface MovieDetails {
+// 	poster_path: string;
+// 	overview: string;
+// 	release_date: string;
+// 	id: number;
+// 	title: string;
+// 	backdrop_path: string;
+// 	popularity: number;
+// 	vote_average: number;
+// 	revenue: number;
+// 	genres: Genre[];
+// 	budget: number;
+// 	spoken_languages: Spoken_language[];
+// 	production_companies: Production_company[];
+// 	runtime: number | null;
+// 	status: string;
+// 	tagline: string | null;
+// }
 
-interface Genre {
-	id: number;
-	name: string;
-}
+// interface Genre {
+// 	id: number;
+// 	name: string;
+// }
 
-interface Spoken_language {
-	iso_639_1: string;
-	name: string;
-}
+// interface Spoken_language {
+// 	iso_639_1: string;
+// 	name: string;
+// }
 
-interface Production_company {
-	id: number;
-	name: string;
-	logo_path: string | null;
-	origin_country: string;
-}
+// interface Production_company {
+// 	id: number;
+// 	name: string;
+// 	logo_path: string | null;
+// 	origin_country: string;
+// }
 
 export default Movies;

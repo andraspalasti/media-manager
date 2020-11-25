@@ -1,7 +1,7 @@
 import { Badge, Box, Button, Flex, Text } from "@chakra-ui/react";
 import React from "react";
-import LoadingImage from "./LoadingImage";
-import Rating from "./Rating";
+import { LoadingImage } from "./LoadingImage";
+import { Rating } from "./Rating";
 
 interface MediaRowProps {
 	id: number;
@@ -13,9 +13,7 @@ interface MediaRowProps {
 	onClick?: (id: number, title: string) => void;
 }
 
-export default function MediaRow({ id, title, releaseDate, imagePath, rating, genres, onClick }: MediaRowProps) {
-	console.log(releaseDate);
-
+export const MediaRow: React.FC<MediaRowProps> = ({ id, title, releaseDate, imagePath, rating, genres, onClick }) => {
 	return (
 		<Button whiteSpace="normal" variant="outline" height={160} {...(onClick && { onClick: () => onClick(id, title) })}>
 			<Flex position="relative" width="100%" overflow="hidden" rounded="lg" alignItems="center">
@@ -35,9 +33,6 @@ export default function MediaRow({ id, title, releaseDate, imagePath, rating, ge
 								</Badge>
 							))}
 					</Flex>
-					{/* <Badge position="absolute" bottom={0} left={0} p={1} variant="solid" bg="orange.300" color="black">
-						TV Show
-					</Badge> */}
 					<Text position="absolute" right={0} bottom={0} color="gray.400" ml={1}>
 						{!isNaN(releaseDate.valueOf()) && releaseDate.getFullYear()}
 					</Text>
@@ -45,4 +40,4 @@ export default function MediaRow({ id, title, releaseDate, imagePath, rating, ge
 			</Flex>
 		</Button>
 	);
-}
+};

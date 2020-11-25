@@ -9,7 +9,6 @@ import { ContextType } from "./types";
 import { MovieRequestResolver } from "./resolvers/movieRequestResolver";
 import cors from "cors";
 import setup from "./setup";
-import { MovieDetailsResolver } from "./resolvers/movieDetailsResolver";
 import { VideoResolver } from "./resolvers/videoResolver";
 import puppeteer from "puppeteer";
 import { TorrentResolver } from "./resolvers/torrentResolver";
@@ -31,7 +30,7 @@ import { createConnection } from "typeorm";
 	await setup({ db: db, browser: browser });
 
 	const schema = await buildSchema({
-		resolvers: [MovieResolver, MovieRequestResolver, MovieDetailsResolver, VideoResolver, TorrentResolver],
+		resolvers: [MovieResolver, MovieRequestResolver, VideoResolver, TorrentResolver],
 	});
 	const server = new ApolloServer({
 		schema,

@@ -1,54 +1,29 @@
 import { Skeleton, Image, ImageProps } from "@chakra-ui/react";
-import React, { Component, createRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-interface Dimensions {
-	width: number | undefined;
-	height: number | undefined;
-}
-
-interface Props {
-	imagePath: string;
+interface LoadingImageProps {
+	imagePath: string | undefined | null;
 	sizes: number[];
 	style?: ImageProps;
 }
 
-interface State {
-	isLoaded: boolean;
-	dimensions: Dimensions;
-}
+export const LoadingImage: React.FC<LoadingImageProps> = ({ sizes, imagePath, style }) => {
+	const container = useRef<HTMLDivElement>(null);
+	const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+	const [isLoaded, setLoaded] = useState(false);
+	useEffect(() => {
+		setDimensions({ width: container.current?.offsetWidth || 0, height: container.current?.offsetHeight || 0 });
+	}, []);
 
-export default class LoadingImage extends Component<Props, State> {
-	private container = createRef<HTMLDivElement>();
-	constructor(props: Props) {
-		super(props);
-		this.state = { isLoaded: false, dimensions: { width: undefined, height: undefined } };
-		this.props.sizes.sort((a, b) => a - b);
-	}
-	componentDidMount() {
-		this.setState({
-			dimensions: {
-				width: this.container.current?.offsetWidth,
-				height: this.container.current?.offsetHeight,
-			},
-		});
-	}
-
-	render() {
-		const width = this.state.dimensions.width || 0;
-		const size = this.props.sizes.find((size) => size > width) || "original";
-		return (
-			<div ref={this.container} style={{ height: "100%", width: "100%" }}>
-				<Skeleton width="100%" height="100%" rounded="md" isLoaded={this.state.isLoaded}>
-					{size && this.props.imagePath && (
-						<Image
-							src={`https://image.tmdb.org/t/p/${typeof size == "number" ? "w" : ""}${size}${this.props.imagePath}`}
-							onLoad={() => this.setState({ isLoaded: true })}
-							ignoreFallback
-							{...this.props.style}
-						/>
-					)}
-				</Skeleton>
-			</div>
-		);
-	}
-}
+	sizes.sort((a, b) => a - b);
+	const size = dimensions.width && sizes.find((size) => size > dimensions.width);
+	console.log("ran");
+	return (
+		<div ref={container} style={{ height: "100%", width: "100%" }}>
+			{!isLoaded && <Skeleton width="100%" height="100%" rounded="md"></Skeleton>}
+			{size && imagePath && (
+				<Image src={`https://image.tmdb.org/t/p/${size !== 0 ? `w${size}` : "original"}${imagePath}`} onLoad={() => setLoaded(true)} ignoreFallback />
+			)}
+		</div>
+	);
+};

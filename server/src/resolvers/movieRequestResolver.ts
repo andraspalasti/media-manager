@@ -1,6 +1,6 @@
 import { Resolver, FieldResolver, Ctx, Root, Query, Arg } from "type-graphql";
 import { MovieGenre } from "../entities/movieGenre";
-import { MovieRequest, MovieResponse } from "../schemas/movieRequest";
+import { MovieDetails, MovieRequest, MovieResponse } from "../schemas/movieRequest";
 import { ContextType } from "../types";
 import fetch from "node-fetch";
 import { In } from "typeorm";
@@ -24,5 +24,10 @@ export class MovieRequestResolver {
 	@Query(() => MovieResponse)
 	async trendingMovies() {
 		return await fetch(`${process.env.BASE_URL}/trending/movie/week?api_key=${process.env.API_KEY}`).then((response) => response.json());
+	}
+
+	@Query(() => MovieDetails)
+	async movieDetails(@Arg("id") id: string): Promise<MovieDetails> {
+		return await fetch(`${process.env.BASE_URL}/movie/${id}?api_key=${process.env.API_KEY}`).then((response) => response.json());
 	}
 }
