@@ -2,12 +2,12 @@ import { Alert, AlertDescription, AlertIcon, AlertTitle, Box, Divider, Flex, Hea
 import React from "react";
 import { useHistory } from "react-router-dom";
 import { useTrendingMoviesQuery } from "../generated/graphql";
-import MediaCard from "./MediaCard";
+import { MediaCard } from "./MediaCard";
 
 export const TrendingMovies: React.FC = () => {
 	const history = useHistory();
-	const [{ fetching, error, data }] = useTrendingMoviesQuery();
-	if (fetching)
+	const { loading, error, data } = useTrendingMoviesQuery();
+	if (loading)
 		return (
 			<Flex justifyContent="center" m="auto" alignItems="center" size="xs">
 				<Spinner size="xl" />

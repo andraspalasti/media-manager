@@ -3,11 +3,11 @@ import { SearchIcon } from "@chakra-ui/icons";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { MediaRow } from "./MediaRow";
-import { useSearchMovieQuery } from "../generated/graphql";
+import { useSearchMovieLazyQuery } from "../generated/graphql";
 
 let debounce: any;
 
-export const MediaSearchBar: React.FC<{}> = () => {
+export const MediaSearchBar: React.FC = () => {
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setTitle(e.target.value);
 		if (e.target.value !== "") {
@@ -42,12 +42,12 @@ interface ResultProps {
 
 const Results: React.FC<ResultProps> = ({ title }) => {
 	const history = useHistory();
-	const [{ fetching, data, error }, searchForMovie] = useSearchMovieQuery({ pause: true, variables: { title } });
+	const [searchForMovie, { loading, data, error }] = useSearchMovieLazyQuery();
 
 	useEffect(() => {
 		if (title !== "") {
 			debounce && clearTimeout(debounce);
-			debounce = setTimeout(searchForMovie, 500);
+			debounce = setTimeout(() => searchForMovie({ variables: { title } }), 500);
 		}
 	}, [searchForMovie, title]);
 
@@ -55,7 +55,7 @@ const Results: React.FC<ResultProps> = ({ title }) => {
 		console.error(error);
 		return <Center color="red.400">Ooops... an error occured</Center>;
 	}
-	if (fetching) {
+	if (loading) {
 		return (
 			<Center p={5}>
 				<Spinner size="xl" />

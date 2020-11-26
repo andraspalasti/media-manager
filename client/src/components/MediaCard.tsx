@@ -12,9 +12,8 @@ interface MediaCardProps {
 	onClick?: (id: number, title: string) => void;
 }
 
-function MediaCard({ id, title, imgPath, genres, rating, onClick }: MediaCardProps) {
+export const MediaCard: React.FC<MediaCardProps> = ({ id, title, imgPath, genres, rating, onClick }) => {
 	const [mouseOver, handleMouseOver] = useState(false);
-
 	return (
 		<Box
 			position="relative"
@@ -52,6 +51,4 @@ function MediaCard({ id, title, imgPath, genres, rating, onClick }: MediaCardPro
 			</Box>
 		</Box>
 	);
-}
-
-export default MediaCard;
+};

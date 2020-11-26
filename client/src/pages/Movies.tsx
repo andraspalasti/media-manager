@@ -24,11 +24,11 @@ import { Rating } from "../components/Rating";
 import { Videos } from "../components/Videos";
 import { useMovieDetailsQuery } from "../generated/graphql";
 
-function Movies() {
+export const Movies = () => {
 	const { movieId }: { movieId: string } = useParams();
 
-	const [{ fetching, error, data }] = useMovieDetailsQuery({ variables: { id: movieId } });
-	if (fetching) {
+	const { loading, error, data } = useMovieDetailsQuery({ variables: { id: movieId } });
+	if (loading) {
 		return (
 			<Center width="100%" height="100vh" size="xs">
 				<Spinner size="xl" />
@@ -164,7 +164,7 @@ function Movies() {
 			</Box>
 		</Box>
 	);
-}
+};
 
 const formatter = new Intl.NumberFormat("en-US", {
 	style: "currency",
@@ -172,69 +172,3 @@ const formatter = new Intl.NumberFormat("en-US", {
 	maximumFractionDigits: 0,
 	minimumFractionDigits: 0,
 });
-
-// const MOVIE_DETAILS = `
-// 	query getMovieDetails($id: Float!) {
-// 		getMovieDetails(id: $id) {
-// 			id
-// 			title
-// 			poster_path
-// 			overview
-// 			release_date
-// 			vote_average
-// 			backdrop_path
-// 			revenue
-// 			budget
-// 			runtime
-// 			status
-// 			spoken_languages {
-// 				name
-// 			}
-// 			production_companies {
-// 				name
-// 			}
-// 			tagline
-// 			genres {
-// 				name
-// 			}
-// 		}
-// 	}
-// `;
-
-// interface MovieDetails {
-// 	poster_path: string;
-// 	overview: string;
-// 	release_date: string;
-// 	id: number;
-// 	title: string;
-// 	backdrop_path: string;
-// 	popularity: number;
-// 	vote_average: number;
-// 	revenue: number;
-// 	genres: Genre[];
-// 	budget: number;
-// 	spoken_languages: Spoken_language[];
-// 	production_companies: Production_company[];
-// 	runtime: number | null;
-// 	status: string;
-// 	tagline: string | null;
-// }
-
-// interface Genre {
-// 	id: number;
-// 	name: string;
-// }
-
-// interface Spoken_language {
-// 	iso_639_1: string;
-// 	name: string;
-// }
-
-// interface Production_company {
-// 	id: number;
-// 	name: string;
-// 	logo_path: string | null;
-// 	origin_country: string;
-// }
-
-export default Movies;

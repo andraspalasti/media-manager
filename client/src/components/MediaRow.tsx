@@ -15,7 +15,7 @@ interface MediaRowProps {
 
 export const MediaRow: React.FC<MediaRowProps> = ({ id, title, releaseDate, imagePath, rating, genres, onClick }) => {
 	return (
-		<Button whiteSpace="normal" variant="outline" height={160} {...(onClick && { onClick: () => onClick(id, title) })}>
+		<Button whiteSpace="normal" variant="outline" p={0} height={160} {...(onClick && { onClick: () => onClick(id, title) })}>
 			<Flex position="relative" width="100%" overflow="hidden" rounded="lg" alignItems="center">
 				<Box height={138} width={92} flexShrink={0} rounded="lg" shadow="lg" overflow="hidden" mr={6}>
 					<LoadingImage imagePath={imagePath} sizes={[92, 154, 185, 342, 500, 780]} />

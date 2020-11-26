@@ -24,11 +24,11 @@ interface VideosProps {
 }
 
 export const Videos: React.FC<VideosProps> = ({ id, type }) => {
-	const [{ fetching, error, data }] = useVideosQuery({ variables: { id: id, type } });
+	const { loading, error, data } = useVideosQuery({ variables: { id: id, type } });
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [selectedVideo, selectVideo] = useState("");
 
-	if (fetching)
+	if (loading)
 		return (
 			<Center height="100%" width="100%">
 				<Spinner size="xl" />

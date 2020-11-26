@@ -4,10 +4,11 @@ import { render } from "react-dom";
 import App from "./App";
 import "./css/App.css";
 import { BrowserRouter as Router } from "react-router-dom";
-import { createClient, Provider } from "urql";
+import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 
-const urqlClient = createClient({
-	url: "http://192.168.1.37:4000/graphql",
+const client = new ApolloClient({
+	uri: "http://192.168.1.37:4000/graphql",
+	cache: new InMemoryCache(),
 });
 
 const customTheme = extendTheme({
@@ -19,12 +20,12 @@ const customTheme = extendTheme({
 
 const rootElement = document.getElementById("root");
 render(
-	<ChakraProvider theme={customTheme}>
-		<Provider value={urqlClient}>
+	<ApolloProvider client={client}>
+		<ChakraProvider theme={customTheme}>
 			<Router>
 				<App />
 			</Router>
-		</Provider>
-	</ChakraProvider>,
+		</ChakraProvider>
+	</ApolloProvider>,
 	rootElement
 );

@@ -13,8 +13,6 @@ export const Rating: React.FC<RatingProps> = ({ rating }) => {
 				return i < Math.round((rating || 0) / 2) ? (
 					<StarIcon color="orange.300" key={i} fontSize="sm" mr={1} />
 				) : (
-					// <Icon name="star" color="orange.300" key={i} fontSize="sm" mr={1} />
-					// <Icon name="star" stroke="orange.300" key={i} color="transparent" fontSize="sm" mr={1} />
 					<StarIcon stroke="orange.300" key={i} color="transparent" fontSize="sm" mr={1} />
 				);
 			})}
