@@ -7,7 +7,7 @@ interface LoadingImageProps {
 	style?: ImageProps;
 }
 
-export const LoadingImage: React.FC<LoadingImageProps> = ({ sizes, imagePath, style }) => {
+const LoadingImage: React.FC<LoadingImageProps> = ({ sizes, imagePath, style }) => {
 	const container = useRef<HTMLDivElement>(null);
 	const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 	const [isLoaded, setLoaded] = useState(false);
@@ -17,7 +17,6 @@ export const LoadingImage: React.FC<LoadingImageProps> = ({ sizes, imagePath, st
 
 	sizes.sort((a, b) => a - b);
 	const size = dimensions.width && sizes.find((size) => size > dimensions.width);
-	console.log("ran");
 	return (
 		<div ref={container} style={{ height: "100%", width: "100%" }}>
 			{!isLoaded && <Skeleton width="100%" height="100%" rounded="md"></Skeleton>}
@@ -27,3 +26,5 @@ export const LoadingImage: React.FC<LoadingImageProps> = ({ sizes, imagePath, st
 		</div>
 	);
 };
+
+export default LoadingImage;

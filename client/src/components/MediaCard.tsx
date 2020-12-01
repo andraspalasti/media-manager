@@ -1,18 +1,17 @@
-import { Box, Flex, Badge } from "@chakra-ui/react";
+import { Box, Flex, Badge, BoxProps } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { LoadingImage } from "./LoadingImage";
-import { Rating } from "./Rating";
+import LoadingImage from "./LoadingImage";
+import Rating from "./Rating";
 
-interface MediaCardProps {
-	id: number;
+interface MediaCardProps extends BoxProps {
+	id: string;
 	title: string;
-	imgPath: string | undefined;
+	imgPath: string | null | undefined;
 	genres: string[];
 	rating: number;
-	onClick?: (id: number, title: string) => void;
 }
 
-export const MediaCard: React.FC<MediaCardProps> = ({ id, title, imgPath, genres, rating, onClick }) => {
+const MediaCard: React.FC<MediaCardProps> = ({ id, title, imgPath, genres, rating, ...rest }) => {
 	const [mouseOver, handleMouseOver] = useState(false);
 	return (
 		<Box
@@ -21,7 +20,8 @@ export const MediaCard: React.FC<MediaCardProps> = ({ id, title, imgPath, genres
 			onMouseOver={() => handleMouseOver(true)}
 			onMouseOut={() => handleMouseOver(false)}
 			rounded="md"
-			{...(onClick && { onClick: () => onClick(id, title) })}
+			shadow="xl"
+			{...rest}
 		>
 			<Box width="100%" height={{ base: 300, md: 350 }}>
 				<LoadingImage imagePath={imgPath || ""} sizes={[92, 154, 185, 342, 500, 780]} />
@@ -32,7 +32,7 @@ export const MediaCard: React.FC<MediaCardProps> = ({ id, title, imgPath, genres
 				px={2}
 				width="100%"
 				bottom={0}
-				style={{ backdropFilter: "contrast(4) blur(20px)", background: "rgba(0,0,0,0.4)" }}
+				style={{ backdropFilter: "blur(15px)", background: "rgba(0,0,0,0.5)" }}
 				borderBottomRadius="md"
 			>
 				<Box mt={1} fontWeight="semibold" as="h3" fontSize="md" color="white" isTruncated>
@@ -52,3 +52,5 @@ export const MediaCard: React.FC<MediaCardProps> = ({ id, title, imgPath, genres
 		</Box>
 	);
 };
+
+export default MediaCard;

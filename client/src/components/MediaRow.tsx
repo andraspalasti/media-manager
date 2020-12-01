@@ -1,43 +1,45 @@
-import { Badge, Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Box, BoxProps, Flex, Text } from "@chakra-ui/react";
 import React from "react";
-import { LoadingImage } from "./LoadingImage";
-import { Rating } from "./Rating";
+import LoadingImage from "./LoadingImage";
+import Rating from "./Rating";
 
-interface MediaRowProps {
-	id: number;
+interface MediaRowProps extends BoxProps {
+	id: string;
 	title: string;
 	releaseDate: Date;
-	genres: string[];
-	imagePath: string;
+	overview: string;
+	imagePath: string | undefined | null;
 	rating: number;
-	onClick?: (id: number, title: string) => void;
 }
 
-export const MediaRow: React.FC<MediaRowProps> = ({ id, title, releaseDate, imagePath, rating, genres, onClick }) => {
+const MediaRow: React.FC<MediaRowProps> = ({ id, title, releaseDate, imagePath, rating, overview, ...rest }) => {
 	return (
-		<Button whiteSpace="normal" variant="outline" p={0} height={160} {...(onClick && { onClick: () => onClick(id, title) })}>
-			<Flex position="relative" width="100%" overflow="hidden" rounded="lg" alignItems="center">
-				<Box height={138} width={92} flexShrink={0} rounded="lg" shadow="lg" overflow="hidden" mr={6}>
+		<Box
+			whiteSpace="normal"
+			background="gray.800"
+			boxShadow="xl"
+			rounded="lg"
+			transition="all ease-in-out 300ms"
+			_hover={{ bgColor: "gray.700", cursor: "pointer" }}
+			{...rest}
+		>
+			<Flex position="relative" width="100%" p={0} height="100%" overflow="hidden" rounded="lg" alignItems="center">
+				<Box height={138} width={92} flexShrink={0} rounded="lg" overflow="hidden" mr={6}>
 					<LoadingImage imagePath={imagePath} sizes={[92, 154, 185, 342, 500, 780]} />
 				</Box>
-				<Box maxHeight={123} overflowY="hidden" width="auto" flexGrow={2} textAlign="start">
-					<Text fontWeight="medium" mb={1} as="h3" fontSize="lg" lineHeight="tight">
+				<Box maxHeight={123} overflowY="hidden" pr={4} width="auto" flexGrow={2} textAlign="start">
+					<Text fontWeight="small" noOfLines={2} mb={1} fontSize="xl">
 						{title}
+						<span style={{ color: "#718096" }}> ({!isNaN(releaseDate.valueOf()) && releaseDate.getFullYear()})</span>
 					</Text>
 					<Rating rating={rating} />
-					<Flex mt={1} alignItems="center" flexWrap="wrap" alignContent="space-around" overflow="hidden">
-						{genres &&
-							genres.map((val) => (
-								<Badge colorScheme="blue" key={val} p={1} mt={1} mr={2}>
-									{val}
-								</Badge>
-							))}
-					</Flex>
-					<Text position="absolute" right={0} bottom={0} color="gray.400" ml={1}>
-						{!isNaN(releaseDate.valueOf()) && releaseDate.getFullYear()}
+					<Text noOfLines={1} color="gray.500">
+						{overview}
 					</Text>
 				</Box>
 			</Flex>
-		</Button>
+		</Box>
 	);
 };
+
+export default MediaRow;

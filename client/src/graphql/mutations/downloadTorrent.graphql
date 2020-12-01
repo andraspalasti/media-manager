@@ -1,0 +1,3 @@
+mutation downloadTorrent($movieId: String!, $title: String!, $torrentName: String!, $downloadLink: String!, $type: String!) {
+	downloadTorrent(movieId: $movieId, title: $title, torrentName: $torrentName, downloadLink: $downloadLink, type: $type)
+}

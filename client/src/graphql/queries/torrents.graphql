@@ -1,0 +1,9 @@
+query Torrents($title: String!) {
+	getTorrents(title: $title) {
+		title
+		size
+		type
+		files
+		downloadLink
+	}
+}

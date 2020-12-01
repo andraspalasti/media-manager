@@ -4,26 +4,34 @@ import React from "react";
 import Home from "./pages/Home";
 import { Switch, Route, useHistory } from "react-router-dom";
 import { Movies } from "./pages/Movies";
+import Torrents from "./pages/Torrents";
 
 function App() {
+	const history = useHistory();
 	return (
 		<>
 			<Switch>
-				<Route path="/" exact>
+				<Route path="/movies/:movieId">
+					<MoviesHeader />
+				</Route>
+				<Route path="/">
 					<Flex width="100%" justifyContent="flex-end" p={3}>
-						<Button mr={2} leftIcon={<DownloadIcon />}>
+						<Route path="/torrents">
+							<IconButton onClick={() => history.push("/")} aria-label="Back button" icon={<ArrowBackIcon />} />
+						</Route>
+						<Button mr={2} leftIcon={<DownloadIcon />} onClick={() => history.push("/torrents")}>
 							Torrents
 						</Button>
 					</Flex>
-				</Route>
-				<Route path="/">
-					<MoviesHeader />
 				</Route>
 			</Switch>
 			<main>
 				<Switch>
 					<Route path="/movies/:movieId">
 						<Movies />
+					</Route>
+					<Route path="/torrents">
+						<Torrents />
 					</Route>
 					<Route path="/">
 						<Home />

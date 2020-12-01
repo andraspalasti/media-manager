@@ -1,15 +1,12 @@
-import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { ChakraProvider, createStandaloneToast, extendTheme } from "@chakra-ui/react";
 import React from "react";
 import { render } from "react-dom";
 import App from "./App";
 import "./css/App.css";
 import { BrowserRouter as Router } from "react-router-dom";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
-
-const client = new ApolloClient({
-	uri: "http://192.168.1.37:4000/graphql",
-	cache: new InMemoryCache(),
-});
+import { onError } from "apollo-link-error";
+import { HttpLink } from "apollo-link-http";
 
 const customTheme = extendTheme({
 	config: {
@@ -18,14 +15,41 @@ const customTheme = extendTheme({
 	},
 });
 
+const toast = createStandaloneToast({ colorMode: "dark" });
+
+const httpLink = new HttpLink({
+	uri: "http://192.168.1.37:4000/graphql",
+});
+
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+	if (graphQLErrors)
+		graphQLErrors.forEach(({ message, locations, path }) => {
+			console.log(`[GraphQL error]: Message: ${message}, Location: ${locations} Path: ${path}`);
+			toast({
+				title: "Ooops.",
+				description: message,
+				status: "error",
+				duration: 9000,
+				isClosable: true,
+			});
+		});
+
+	if (networkError) console.log(`[Network error]: ${networkError}`);
+});
+
+const client = new ApolloClient({
+	link: errorLink.concat(httpLink) as any,
+	cache: new InMemoryCache(),
+});
+
 const rootElement = document.getElementById("root");
 render(
-	<ApolloProvider client={client}>
-		<ChakraProvider theme={customTheme}>
+	<ChakraProvider theme={customTheme}>
+		<ApolloProvider client={client}>
 			<Router>
 				<App />
 			</Router>
-		</ChakraProvider>
-	</ApolloProvider>,
+		</ApolloProvider>
+	</ChakraProvider>,
 	rootElement
 );

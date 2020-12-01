@@ -2,9 +2,9 @@ import { Alert, AlertDescription, AlertIcon, AlertTitle, Box, Divider, Flex, Hea
 import React from "react";
 import { useHistory } from "react-router-dom";
 import { useTrendingMoviesQuery } from "../generated/graphql";
-import { MediaCard } from "./MediaCard";
+import MediaCard from "./MediaCard";
 
-export const TrendingMovies: React.FC = () => {
+const TrendingMovies: React.FC = () => {
 	const history = useHistory();
 	const { loading, error, data } = useTrendingMoviesQuery();
 	if (loading)
@@ -35,7 +35,7 @@ export const TrendingMovies: React.FC = () => {
 			<Divider borderColor="gray.300" mt={1} mb={2} />
 			<Flex overflowX="auto" height="auto" pb={2} style={{ gap: 14 }}>
 				{trendingMovies &&
-					trendingMovies.map((movie: any) => {
+					trendingMovies.map((movie) => {
 						return (
 							<Box
 								width={{ base: 200, md: 240 }}
@@ -55,8 +55,8 @@ export const TrendingMovies: React.FC = () => {
 									imgPath={movie.poster_path}
 									genres={movie.genres}
 									rating={movie.vote_average}
-									onClick={(id) => {
-										history.push(`/movies/${id}`);
+									onClick={() => {
+										history.push(`/movies/${movie.id}`);
 									}}
 								/>
 							</Box>
@@ -66,3 +66,5 @@ export const TrendingMovies: React.FC = () => {
 		</>
 	);
 };
+
+export default TrendingMovies;

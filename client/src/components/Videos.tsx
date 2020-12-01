@@ -13,6 +13,7 @@ import {
 	AlertDescription,
 	AlertIcon,
 	AlertTitle,
+	BoxProps,
 } from "@chakra-ui/react";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import React, { useState } from "react";
@@ -23,7 +24,7 @@ interface VideosProps {
 	type: "movie" | "tv";
 }
 
-export const Videos: React.FC<VideosProps> = ({ id, type }) => {
+const Videos: React.FC<VideosProps> = ({ id, type }) => {
 	const { loading, error, data } = useVideosQuery({ variables: { id: id, type } });
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [selectedVideo, selectVideo] = useState("");
@@ -48,9 +49,13 @@ export const Videos: React.FC<VideosProps> = ({ id, type }) => {
 		);
 	}
 
-	const videos = data?.getVideos?.results.filter(({ site }: any) => site === "YouTube");
-	if (!videos) {
-		<Center width="100%">No videos found</Center>;
+	const videos = data?.getVideos?.results.filter(({ site }) => site === "YouTube");
+	if (videos?.length === 0) {
+		return (
+			<Center height="30vh" width="100%">
+				<Text fontSize="2xl">No videos found</Text>
+			</Center>
+		);
 	}
 
 	return (
@@ -71,14 +76,14 @@ export const Videos: React.FC<VideosProps> = ({ id, type }) => {
 			</Modal>
 			<Flex wrap="wrap" justifyContent="flex-start">
 				{videos &&
-					videos.map(({ key, name, site, type }: any) => {
+					videos.map(({ key, name, site, type }) => {
 						return (
 							<VideoElement
 								key={key}
 								id={key}
 								name={name}
 								type={type}
-								onClick={(id) => {
+								onClick={() => {
 									onOpen();
 									selectVideo(id);
 								}}
@@ -90,14 +95,13 @@ export const Videos: React.FC<VideosProps> = ({ id, type }) => {
 	);
 };
 
-interface VideoElementProps {
+interface VideoElementProps extends BoxProps {
 	id: string;
 	name: string;
 	type: string;
-	onClick?: (id: string) => void;
 }
 
-const VideoElement: React.FC<VideoElementProps> = ({ id, name, type, onClick }) => {
+const VideoElement: React.FC<VideoElementProps> = ({ id, name, type, ...rest }) => {
 	const [mouseOver, handleMouseOver] = useState(false);
 	return (
 		<Box
@@ -108,7 +112,7 @@ const VideoElement: React.FC<VideoElementProps> = ({ id, name, type, onClick }) 
 			onMouseOut={() => handleMouseOver(false)}
 			width={{ base: "100%", md: "33.333%", lg: "25%" }}
 			_hover={{ cursor: "pointer" }}
-			{...(onClick && { onClick: () => onClick(id) })}
+			{...rest}
 		>
 			<Box position="relative" rounded="sm" overflow="hidden">
 				<Flex
@@ -133,3 +137,5 @@ const VideoElement: React.FC<VideoElementProps> = ({ id, name, type, onClick }) 
 		</Box>
 	);
 };
+
+export default Videos;

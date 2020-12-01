@@ -1,17 +1,21 @@
 import { Field } from "type-graphql/dist/decorators/Field";
 import { ObjectType } from "type-graphql/dist/decorators/ObjectType";
 import { ID, Int } from "type-graphql/dist/scalars/aliases";
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @ObjectType()
 @Entity()
 export class Movie {
 	@Field((type) => ID)
-	@PrimaryColumn()
+	@PrimaryGeneratedColumn()
 	id!: number;
 
 	@Field()
-	@Column({ unique: true })
+	@Column({ nullable: true })
+	movieId?: string;
+
+	@Field()
+	@Column({ unique: true, nullable: true })
 	torrentId?: string;
 
 	@Field()
@@ -27,7 +31,7 @@ export class Movie {
 	size?: number;
 
 	@Field()
-	@Column()
+	@CreateDateColumn()
 	addedAt: Date = new Date();
 
 	@Field({ nullable: true })

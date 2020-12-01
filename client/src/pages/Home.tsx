@@ -1,7 +1,7 @@
 import { Box } from "@chakra-ui/react";
 import React from "react";
-import { MediaSearchBar } from "../components/MediaSearchBar";
-import { TrendingMovies } from "../components/TrendingMovies";
+import MediaSearchBar from "../components/MediaSearchBar";
+import TrendingMovies from "../components/TrendingMovies";
 
 function Home() {
 	return (

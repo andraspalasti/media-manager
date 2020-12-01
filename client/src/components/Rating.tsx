@@ -6,7 +6,7 @@ interface RatingProps {
 	rating: number | undefined;
 }
 
-export const Rating: React.FC<RatingProps> = ({ rating }) => {
+const Rating: React.FC<RatingProps> = ({ rating }) => {
 	return (
 		<Flex alignItems="center" flexWrap="nowrap" overflow="hidden">
 			{Array.apply(null, Array(5)).map((_, i) => {
@@ -23,3 +23,5 @@ export const Rating: React.FC<RatingProps> = ({ rating }) => {
 		</Flex>
 	);
 };
+
+export default Rating;

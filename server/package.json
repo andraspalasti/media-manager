@@ -18,12 +18,15 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "graphql": "^15.3.0",
+    "graphql-subscriptions": "^1.1.0",
     "mysql2": "^2.2.5",
     "node-fetch": "^2.6.1",
     "puppeteer": "^5.5.0",
     "reflect-metadata": "^0.1.13",
+    "subscriptions-transport-ws": "^0.9.18",
     "type-graphql": "^1.1.0",
-    "typeorm": "^0.2.29"
+    "typeorm": "^0.2.29",
+    "webtorrent": "^0.112.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.8",
@@ -31,6 +34,7 @@
     "@types/graphql-depth-limit": "^1.1.2",
     "@types/node": "^14.14.9",
     "@types/puppeteer": "^5.4.0",
+    "@types/webtorrent": "^0.109.0",
     "graphql-depth-limit": "^1.1.0",
     "graphql-import": "^1.0.2",
     "graphql-import-node": "0.0.4",

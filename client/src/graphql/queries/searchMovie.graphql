@@ -3,7 +3,7 @@ query searchMovie($title: String!) {
 			results {
 				id
 				title
-				genres
+				overview
 				release_date
 				popularity
 				vote_average

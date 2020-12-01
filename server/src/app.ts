@@ -2,17 +2,22 @@ require("dotenv").config();
 
 import "reflect-metadata";
 import { ApolloServer } from "apollo-server-express";
-import express from "express";
 import { buildSchema } from "type-graphql";
-import { MovieResolver } from "./resolvers/movieResolver";
-import { ContextType } from "./types";
-import { MovieRequestResolver } from "./resolvers/movieRequestResolver";
+import { PubSub } from "graphql-subscriptions";
+import { execute, subscribe } from "graphql";
+import { SubscriptionServer } from "subscriptions-transport-ws";
+import { createServer } from "http";
+import express from "express";
 import cors from "cors";
-import setup from "./setup";
-import { VideoResolver } from "./resolvers/videoResolver";
 import puppeteer from "puppeteer";
-import { TorrentResolver } from "./resolvers/torrentResolver";
+import WebTorrent from "webtorrent";
 import { createConnection } from "typeorm";
+import setup from "./setup";
+import { ContextType } from "./types";
+import { MovieResolver } from "./resolvers/movieResolver";
+import { MovieRequestResolver } from "./resolvers/movieRequestResolver";
+import { VideoResolver } from "./resolvers/videoResolver";
+import { TorrentResolver } from "./resolvers/torrentResolver";
 
 (async () => {
 	const db = await createConnection({
@@ -27,28 +32,35 @@ import { createConnection } from "typeorm";
 		logging: process.env.NODE_ENV !== "production",
 	});
 	const browser = await puppeteer.launch({ headless: process.env.NODE_ENV === "production" });
-	await setup({ db: db, browser: browser });
+	const client = new WebTorrent();
 
+	await setup({ db, browser, client });
 	const schema = await buildSchema({
 		resolvers: [MovieResolver, MovieRequestResolver, VideoResolver, TorrentResolver],
 	});
-	const server = new ApolloServer({
+	const apolloServer = new ApolloServer({
 		schema,
 		context: (): ContextType => {
-			return { db: db, browser: browser };
+			return { db, browser, client };
 		},
 	});
-
 	const app = express();
-
 	const corsOptions = {
 		origin: true,
 		credentials: true,
 	};
-
 	app.use(cors(corsOptions));
+	apolloServer.applyMiddleware({ app });
 
-	server.applyMiddleware({ app });
+	const pubsub = new PubSub();
+	const server = createServer(app);
 
-	app.listen({ port: 4000 }, () => console.log(`Server ready at http://localhost:4000${server.graphqlPath}`));
+	server.listen(4000, () => {
+		new SubscriptionServer({ execute, subscribe, schema }, { server });
+		console.log(`Server ready at http://localhost:4000${apolloServer.graphqlPath}`);
+	});
+
+	// app.listen({ port: 4000 }, () => {
+	// 	console.log(`Server ready at http://localhost:4000${apolloServer.graphqlPath}`);
+	// });
 })();

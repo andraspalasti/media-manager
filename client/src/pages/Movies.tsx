@@ -19,9 +19,10 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { useParams } from "react-router-dom";
-import { LoadingImage } from "../components/LoadingImage";
-import { Rating } from "../components/Rating";
-import { Videos } from "../components/Videos";
+import LoadingImage from "../components/LoadingImage";
+import Rating from "../components/Rating";
+import Torrents from "../components/DownloadableTorrents";
+import Videos from "../components/Videos";
 import { useMovieDetailsQuery } from "../generated/graphql";
 
 export const Movies = () => {
@@ -51,8 +52,15 @@ export const Movies = () => {
 	const runtime = new Date(0, 0, 0, 0, movie?.runtime || 0);
 	return (
 		<Box width="100%" mx="auto">
-			<Box position="relative" d={{ base: "block", md: "grid" }} gridTemplateColumns="repeat(8, minmax(0, 1fr))" alignItems="center" width="100%">
-				<Box gridRow={1} gridColumn="4 / 10" width="100%">
+			<Box
+				position="relative"
+				d={{ base: "block", md: "grid" }}
+				minH="40vh"
+				gridTemplateColumns="repeat(8, minmax(0, 1fr))"
+				alignItems="center"
+				width="100%"
+			>
+				<Box gridRow={1} gridColumn="4 / 10" width="100%" height="100%">
 					<LoadingImage imagePath={movie?.backdrop_path || ""} style={{ ml: "auto" }} sizes={[300, 780, 1280]} />
 				</Box>
 				<Box
@@ -156,9 +164,7 @@ export const Movies = () => {
 							</Flex>
 						</TabPanel>
 						<TabPanel>{movie?.id && <Videos id={movie?.id} type="movie" />}</TabPanel>
-						<TabPanel>
-							<p>three!</p>
-						</TabPanel>
+						<TabPanel textAlign="start">{movie?.title && <Torrents title={movie?.title} movieId={movieId} />}</TabPanel>
 					</TabPanels>
 				</Tabs>
 			</Box>
