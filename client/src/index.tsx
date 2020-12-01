@@ -16,9 +16,8 @@ const customTheme = extendTheme({
 });
 
 const toast = createStandaloneToast({ colorMode: "dark" });
-
 const httpLink = new HttpLink({
-	uri: "http://192.168.1.37:4000/graphql",
+	uri: `http://${process.env.REACT_APP_HOST_IP}:${process.env.REACT_APP_HOST_PORT}/graphql`,
 });
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
