@@ -1,10 +1,11 @@
-import { Box, Button, Flex, IconButton } from "@chakra-ui/react";
-import { DownloadIcon, ArrowBackIcon } from "@chakra-ui/icons";
+import { Button, Flex, IconButton } from "@chakra-ui/react";
+import { DownloadIcon } from "@chakra-ui/icons";
 import React from "react";
 import Home from "./pages/Home";
 import { Switch, Route, useHistory } from "react-router-dom";
 import { Movies } from "./pages/Movies";
 import Torrents from "./pages/Torrents";
+import { HomeIcon } from "./icons/HomeIcon";
 
 function App() {
 	const history = useHistory();
@@ -15,13 +16,20 @@ function App() {
 					<MoviesHeader />
 				</Route>
 				<Route path="/">
-					<Flex width="100%" justifyContent="flex-end" p={3}>
+					<Flex width="100%" p={3}>
 						<Route path="/torrents">
-							<IconButton onClick={() => history.push("/")} aria-label="Back button" icon={<ArrowBackIcon />} />
+							<IconButton
+								justifyItems="flex-start"
+								onClick={() => history.push("/")}
+								aria-label="Home button"
+								icon={<HomeIcon w="1.4em" h="1.4em" />}
+							/>
 						</Route>
-						<Button mr={2} leftIcon={<DownloadIcon />} onClick={() => history.push("/torrents")}>
-							Torrents
-						</Button>
+						<Route exact path="/">
+							<Button mr={2} ml="auto" justifyItems="flex-end" leftIcon={<DownloadIcon />} onClick={() => history.push("/torrents")}>
+								Torrents
+							</Button>
+						</Route>
 					</Flex>
 				</Route>
 			</Switch>
@@ -49,16 +57,14 @@ const MoviesHeader: React.FC = () => {
 			<IconButton
 				mr={3}
 				onClick={() => history.push("/")}
-				aria-label="Back button"
+				aria-label="Home button"
 				bg="rgba(10, 10, 10, 0.2)"
 				color="white"
-				icon={<ArrowBackIcon />}
+				icon={<HomeIcon w="1.4em" h="1.4em" />}
 			/>
-			<Box>
-				<Button mr={2} leftIcon={<DownloadIcon />} bg="rgba(10, 10, 10, 0.2)" color="white">
-					Torrents
-				</Button>
-			</Box>
+			<Button mr={2} leftIcon={<DownloadIcon />} bg="rgba(10, 10, 10, 0.2)" onClick={() => history.push("/torrents")} color="white">
+				Torrents
+			</Button>
 		</Flex>
 	);
 };

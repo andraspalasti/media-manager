@@ -26,21 +26,18 @@ export class TorrentProgress {
 	@Field(() => ID)
 	torrentId!: string;
 
-	@Field(() => Float, { nullable: true })
-	progress?: number;
+	@Field(() => Float)
+	progress!: number;
 
-	@Field(() => Float, { nullable: true })
-	downloaded?: number;
+	@Field(() => Float)
+	downloaded!: number;
 
-	@Field(() => Float, { nullable: true })
-	downloadSpeed?: number;
+	@Field(() => Float)
+	downloadSpeed!: number;
 
-	@Field(() => Float, { nullable: true })
-	size?: number;
+	@Field(() => Float)
+	size!: number;
 
-	@Field({ nullable: true })
-	timeRemaining?: string;
-
-	@Field({ nullable: true })
-	error?: string;
+	@Field()
+	timeRemaining!: string;
 }

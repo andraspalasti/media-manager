@@ -1,18 +1,15 @@
+import { Arg } from "type-graphql";
 import { Field } from "type-graphql/dist/decorators/Field";
 import { ObjectType } from "type-graphql/dist/decorators/ObjectType";
-import { ID, Int } from "type-graphql/dist/scalars/aliases";
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Float, ID, Int } from "type-graphql/dist/scalars/aliases";
+import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @ObjectType()
 @Entity()
-export class Movie {
-	@Field((type) => ID)
+export class Movie extends BaseEntity {
+	@Field(() => ID)
 	@PrimaryGeneratedColumn()
 	id!: number;
-
-	@Field()
-	@Column({ nullable: true })
-	movieId?: string;
 
 	@Field()
 	@Column({ unique: true, nullable: true })
@@ -24,13 +21,17 @@ export class Movie {
 
 	@Field()
 	@Column()
-	torrentName?: string;
-
-	@Field((type) => Int)
-	@Column()
-	size?: number;
+	state!: string;
 
 	@Field()
+	@Column()
+	torrentName?: string;
+
+	@Field(() => Float)
+	@Column({ type: "bigint" })
+	size?: number;
+
+	@Field(() => Date)
 	@CreateDateColumn()
 	addedAt: Date = new Date();
 
@@ -41,4 +42,10 @@ export class Movie {
 	@Field()
 	@Column({ default: false })
 	completed!: boolean;
+}
+
+@ObjectType()
+export class Movies {
+	@Field(() => [Movie])
+	movies!: Movie[];
 }

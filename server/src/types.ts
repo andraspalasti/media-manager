@@ -4,7 +4,6 @@ import { Connection } from "typeorm";
 import WebTorrent from "webtorrent";
 
 export interface ContextType {
-	db: Connection;
 	browser: Browser;
 	client: WebTorrent.Instance;
 }

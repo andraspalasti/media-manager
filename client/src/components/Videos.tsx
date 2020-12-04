@@ -70,13 +70,15 @@ const Videos: React.FC<VideosProps> = ({ id, type }) => {
 							height="100%"
 							width="100%"
 							src={`https://www.youtube.com/embed/${selectedVideo}`}
+							frameBorder="0"
+							allowFullScreen
 						></iframe>
 					</Box>
 				</ModalContent>
 			</Modal>
 			<Flex wrap="wrap" justifyContent="flex-start">
 				{videos &&
-					videos.map(({ key, name, site, type }) => {
+					videos.map(({ key, name, type }) => {
 						return (
 							<VideoElement
 								key={key}
@@ -85,7 +87,7 @@ const Videos: React.FC<VideosProps> = ({ id, type }) => {
 								type={type}
 								onClick={() => {
 									onOpen();
-									selectVideo(id);
+									selectVideo(key);
 								}}
 							/>
 						);

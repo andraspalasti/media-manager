@@ -7,12 +7,11 @@ interface MediaRowProps extends BoxProps {
 	id: string;
 	title: string;
 	releaseDate: Date;
-	overview: string;
 	imagePath: string | undefined | null;
 	rating: number;
 }
 
-const MediaRow: React.FC<MediaRowProps> = ({ id, title, releaseDate, imagePath, rating, overview, ...rest }) => {
+const MediaRow: React.FC<MediaRowProps> = ({ id, title, releaseDate, imagePath, rating, ...rest }) => {
 	return (
 		<Box
 			whiteSpace="normal"
@@ -33,9 +32,6 @@ const MediaRow: React.FC<MediaRowProps> = ({ id, title, releaseDate, imagePath, 
 						<span style={{ color: "#718096" }}> ({!isNaN(releaseDate.valueOf()) && releaseDate.getFullYear()})</span>
 					</Text>
 					<Rating rating={rating} />
-					<Text noOfLines={1} color="gray.500">
-						{overview}
-					</Text>
 				</Box>
 			</Flex>
 		</Box>

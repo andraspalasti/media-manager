@@ -3,11 +3,11 @@ import fetch from "node-fetch";
 import { MovieGenre } from "./entities/movieGenre";
 import { getCookies, updateCookies } from "./cookies";
 
-export default async function ({ db, browser }: ContextType) {
+export default async function ({ browser }: ContextType) {
 	const { genres } = await fetch(`${process.env.BASE_URL}/genre/movie/list?api_key=${process.env.API_KEY}&language=en-US`).then((response) =>
 		response.json()
 	);
-	await db.createQueryBuilder().insert().into(MovieGenre).values(genres).orIgnore().execute();
+	await MovieGenre.createQueryBuilder().insert().values(genres).orIgnore().execute();
 	const page = await browser.newPage();
 	await page.goto(process.env.TORRENT_SITE!, { waitUntil: "load", timeout: 60000 }).catch((error) => new Error(error));
 

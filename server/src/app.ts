@@ -34,15 +34,16 @@ import { TorrentResolver } from "./resolvers/torrentResolver";
 	const browser = await puppeteer.launch({ headless: process.env.NODE_ENV === "production" });
 	const client = new WebTorrent();
 
-	await setup({ db, browser, client });
+	await setup({ browser, client });
 	const schema = await buildSchema({
 		resolvers: [MovieResolver, MovieRequestResolver, VideoResolver, TorrentResolver],
 	});
 	const apolloServer = new ApolloServer({
 		schema,
 		context: (): ContextType => {
-			return { db, browser, client };
+			return { browser, client };
 		},
+		subscriptions: { path: "/subscriptions" },
 	});
 	const app = express();
 	const corsOptions = {
@@ -58,9 +59,6 @@ import { TorrentResolver } from "./resolvers/torrentResolver";
 	server.listen(4000, () => {
 		new SubscriptionServer({ execute, subscribe, schema }, { server });
 		console.log(`Server ready at http://localhost:4000${apolloServer.graphqlPath}`);
+		console.log(`Subscriptions ready at ws://localhost:4000${apolloServer.subscriptionsPath}`);
 	});
-
-	// app.listen({ port: 4000 }, () => {
-	// 	console.log(`Server ready at http://localhost:4000${apolloServer.graphqlPath}`);
-	// });
 })();

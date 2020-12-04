@@ -1,0 +1,8 @@
+query torrentProgress($torrentId: String!) {
+	torrentProgress(torrentId: $torrentId) {
+		progress
+		downloaded
+		downloadSpeed
+		timeRemaining
+	}
+}

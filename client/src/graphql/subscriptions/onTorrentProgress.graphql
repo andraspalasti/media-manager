@@ -1,0 +1,8 @@
+subscription onTorrentProgress($torrentId: String!) {
+	torrentProgress: onTorrentProgress(torrentId: $torrentId) {
+		progress
+		downloaded
+		downloadSpeed
+		timeRemaining
+	}
+}

@@ -1,0 +1,3 @@
+mutation deleteTorrent($torrentId: String!) {
+	deleteTorrent(torrentId: $torrentId)
+}

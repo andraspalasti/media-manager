@@ -15,8 +15,8 @@ export class MovieRequestResolver {
 	}
 
 	@FieldResolver(() => [String])
-	async genres(@Root() { genre_ids }: MovieRequest, @Ctx() { db }: ContextType) {
-		const result = await db.getRepository(MovieGenre).find({ where: { id: In(genre_ids) }, cache: 30000 });
+	async genres(@Root() { genre_ids }: MovieRequest) {
+		const result = await MovieGenre.find({ where: { id: In(genre_ids) }, cache: 30000 });
 		const genres = result.map((genre) => genre.name);
 		return genres;
 	}

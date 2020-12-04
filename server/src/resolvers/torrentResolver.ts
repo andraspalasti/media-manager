@@ -2,30 +2,48 @@ import { Page } from "puppeteer";
 import { Query, Arg, Resolver, Ctx, Mutation, Field, ArgsType, Args, Subscription, Root, PubSub, PubSubEngine } from "type-graphql";
 import { getCookies, updateCookies } from "../cookies";
 import { Torrent, TorrentProgress } from "../schemas/torrent";
-import { ContextType, Void } from "../types";
+import { ContextType } from "../types";
 import fs from "fs";
 import path from "path";
 import fetch from "node-fetch";
 import { Movie } from "../entities/movie";
 import { GraphQLError } from "graphql";
+import WebTorrent from "webtorrent";
 
 @Resolver(Torrent)
 export class TorrentResolver {
 	@Subscription(() => TorrentProgress, {
 		topics: ({ args }) => args.torrentId,
 	})
-	torrentProgress(@Root() torrentProgress: TorrentProgress, @Arg("torrentId") torrentId: string) {
+	onTorrentProgress(@Arg("torrentId") torrentId: string, @Root() torrentProgress: TorrentProgress) {
 		return { ...torrentProgress };
 	}
 
-	@Mutation(() => Void)
+	@Mutation(() => Boolean)
+	async deleteTorrent(@Arg("torrentId") torrentId: string, @Ctx() { client }: ContextType) {
+		const torrent = client.get(torrentId) as WebTorrent.Torrent;
+		if (!torrent) return new GraphQLError("There is no torrent with this id");
+		const rootPath = torrent.path;
+		const files = torrent.files.map(({ path }) => path);
+		torrent.removeAllListeners();
+		await new Promise((resolve) => torrent.destroy({}, resolve));
+		await Movie.delete({ torrentId });
+		for (const filePath of files) {
+			fs.unlink(path.join(rootPath, filePath), (err) => {
+				if (err) new GraphQLError(err.message);
+			});
+		}
+		return true;
+	}
+
+	@Mutation(() => Boolean)
 	async downloadTorrent(
-		@Args(() => downloadTorrentArgs) { downloadLink, movieId, title, torrentName }: downloadTorrentArgs,
-		@Ctx() { client, db }: ContextType,
+		@Args(() => downloadTorrentArgs) { downloadLink, title, torrentName }: downloadTorrentArgs,
+		@Ctx() { client }: ContextType,
 		@PubSub() pubSub: PubSubEngine
 	) {
 		try {
-			const movie = await db.getRepository(Movie).findOne({ where: { torrentName } });
+			const movie = await Movie.findOne({ where: { torrentName } });
 			if (movie) return new GraphQLError("You already downloaded this torrent");
 			const res = await fetch(downloadLink, {
 				headers: {
@@ -45,41 +63,38 @@ export class TorrentResolver {
 				});
 			});
 			const torrent = client.add(destination, { path: process.env.MOVIES_FOLDER });
-			torrent.on("ready", async () => {
-				await db.getRepository(Movie).insert({ torrentId: torrent.infoHash, size: torrent.length, movieId, title, torrentName });
+			torrent.setMaxListeners(0);
+			await new Promise((resolve) => {
+				torrent.on("ready", async () => {
+					await Movie.insert({ torrentId: torrent.infoHash, size: torrent.length, title, torrentName, state: "DOWNLOADING" });
+					torrent.removeAllListeners("ready");
+					resolve();
+				});
 			});
-			torrent.on("done", async () => {
-				await db.getRepository(Movie).update({ torrentId: torrent.infoHash }, { completed: true, finishedAt: new Date() });
-				torrent.removeAllListeners();
-			});
-			let percent = 0;
-			torrent.on("download", () => {
-				if (percent < Math.floor(torrent.progress * 100)) {
-					pubSub.publish(torrent.infoHash, {
-						torrentId: torrent.infoHash,
-						downloadSpeed: torrent.downloadSpeed,
-						downloaded: torrent.downloaded,
-						progress: torrent.progress,
-						size: torrent.length,
-						timeRemaining: torrent.timeRemaining.toString(),
-					} as TorrentProgress);
-					percent++;
-				}
-			});
-			torrent.on("error", async (error) => {
-				torrent.removeAllListeners();
-				console.error("Error", error);
-				await db.getRepository(Movie).delete({ torrentId: torrent.infoHash });
-				pubSub.publish(torrent.infoHash, new GraphQLError(error.toString()));
-			});
+			addEventListenersToTorrent(torrent, pubSub);
+			return true;
 		} catch (error) {
 			return new GraphQLError(error);
 		}
 	}
 
+	@Query(() => TorrentProgress)
+	async torrentProgress(@Ctx() { client }: ContextType, @Arg("torrentId") torrentId: string) {
+		const torrent = client.get(torrentId) as WebTorrent.Torrent;
+		if (!torrent) return new GraphQLError("There is no torrent with this id");
+		return {
+			torrentId,
+			downloadSpeed: torrent.downloadSpeed,
+			downloaded: torrent.downloaded,
+			progress: torrent.progress,
+			size: torrent.length,
+			timeRemaining: torrent.timeRemaining.toString(),
+		};
+	}
+
 	@Query(() => [Torrent])
 	async getTorrents(@Arg("title") title: string, @Ctx() { browser }: ContextType): Promise<Torrent[]> {
-		const escapedTitle = title.match(/[a-zA-Z0-9\s]/gi)?.join("");
+		const escapedTitle = title.match(/[a-z0-9\s-]/gi)?.join("");
 		const page = await browser.newPage();
 		await page.goto(process.env.TORRENT_SITE!, { waitUntil: "load", timeout: 60000 }).catch((error) => new Error(error));
 		updateCookies(await page.cookies());
@@ -97,6 +112,33 @@ export class TorrentResolver {
 		return torrents;
 	}
 }
+
+const addEventListenersToTorrent = (torrent: WebTorrent.Torrent, pubSub: PubSubEngine) => {
+	torrent.on("done", async () => {
+		await Movie.update({ torrentId: torrent.infoHash }, { completed: true, finishedAt: new Date(), state: "FINISHED" });
+		torrent.removeAllListeners();
+	});
+	let percent = 0;
+	torrent.on("download", () => {
+		if (percent < torrent.downloaded || torrent.progress === 1) {
+			pubSub.publish(torrent.infoHash, {
+				torrentId: torrent.infoHash,
+				downloadSpeed: torrent.downloadSpeed,
+				downloaded: torrent.downloaded,
+				progress: torrent.progress,
+				size: torrent.length,
+				timeRemaining: torrent.timeRemaining.toString(),
+			} as TorrentProgress);
+			percent = percent + torrent.downloadSpeed * 2;
+		}
+	});
+	torrent.on("error", async (error) => {
+		torrent.removeAllListeners();
+		console.error("Error", error);
+		await Movie.update({ torrentId: torrent.infoHash }, { state: "ERROR", completed: true });
+		pubSub.publish(torrent.infoHash, new GraphQLError(error.toString()));
+	});
+};
 
 const clearFilters = async (page: Page) => {
 	await page.$$eval('input[type="checkbox"]:checked', (elements) => {
@@ -173,9 +215,6 @@ const scrapeTorrents = async (page: Page) => {
 
 @ArgsType()
 class downloadTorrentArgs {
-	@Field()
-	movieId!: string;
-
 	@Field()
 	downloadLink!: string;
 

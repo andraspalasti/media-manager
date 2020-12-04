@@ -18,8 +18,9 @@ import {
 	Spinner,
 	Text,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
-import { useTorrentsLazyQuery, useDownloadTorrentMutation, Torrent } from "../generated/graphql";
+import { AnimatePresence, motion } from "framer-motion";
+import React, { useMemo, useState } from "react";
+import { useDownloadTorrentMutation, Torrent, useTorrentsQuery } from "../generated/graphql";
 import Filter from "./Filter";
 
 interface DownloadableTorrentsProps {
@@ -28,23 +29,28 @@ interface DownloadableTorrentsProps {
 }
 
 const DownloadableTorrents: React.FC<DownloadableTorrentsProps> = ({ title, movieId }) => {
-	const [getTorrents, { loading, data, error }] = useTorrentsLazyQuery({ variables: { title } });
+	const { loading, data, error } = useTorrentsQuery({ variables: { title } });
 	const [downloadTorrent, response] = useDownloadTorrentMutation();
 	const [clickedTorrent, setTorrent] = useState("");
 	const [numOfItemsToShow, setNumOfItems] = useState(8);
 	const [searchTitle, setSearchTitle] = useState("");
 	const [filters, setFilters] = useState<{ [key: string]: boolean }>({});
-	useEffect(() => {
-		getTorrents();
-	}, [getTorrents]);
-	useEffect(() => {
+	let torrents = useMemo(() => {
+		return data?.getTorrents.slice().filter(({ title: torrentName }) => {
+			return !searchTitle || torrentName.toLowerCase().startsWith(searchTitle.toLowerCase());
+		});
+	}, [data?.getTorrents, searchTitle]);
+	useMemo(() => {
 		let temp = {};
-		if (data?.getTorrents)
-			for (const { type } of data?.getTorrents) {
+		if (torrents)
+			for (const { type } of torrents) {
 				temp = { ...temp, [type]: true };
 			}
 		setFilters(temp);
-	}, [data]);
+	}, [torrents]);
+	torrents = useMemo(() => {
+		return torrents?.slice().filter(({ type }) => filters[type]);
+	}, [filters, torrents]);
 
 	if (loading) {
 		return (
@@ -54,7 +60,7 @@ const DownloadableTorrents: React.FC<DownloadableTorrentsProps> = ({ title, movi
 		);
 	}
 
-	if (response.data?.downloadTorrent.success) {
+	if (response.data?.downloadTorrent === true) {
 		return (
 			<Alert rounded="lg" status="success" variant="top-accent" flexDirection="column" p={3} justifyContent="center" textAlign="center">
 				<AlertIcon w="40px" h="40px" mr={0} />
@@ -78,9 +84,6 @@ const DownloadableTorrents: React.FC<DownloadableTorrentsProps> = ({ title, movi
 			</Alert>
 		);
 	}
-	const torrents = data?.getTorrents.filter(({ title: torrentName, type }) => {
-		return (!searchTitle || torrentName.toLowerCase().startsWith(searchTitle.toLowerCase())) && filters[type];
-	});
 
 	return (
 		<>
@@ -120,11 +123,29 @@ const DownloadableTorrents: React.FC<DownloadableTorrentsProps> = ({ title, movi
 							)}
 						</InputGroup>
 						<Flex wrap="wrap">
-							{Object.entries(filters).map(([filter, active]) => (
-								<Box mx={1} mb={1} key={filter}>
-									<Filter name={filter} colorScheme="blue" onClick={() => setFilters({ ...filters, [filter]: !active })} active={active as boolean} />
-								</Box>
-							))}
+							<AnimatePresence>
+								{Object.entries(filters).map(([filter, active]) => (
+									<motion.div
+										initial={{ opacity: 0, translateY: -20 }}
+										animate={{ opacity: 1, translateY: 0 }}
+										exit={{ opacity: 0, translateY: 20 }}
+										transition={{ type: "tween", duration: 0.5 }}
+										key={filter}
+									>
+										<Box mx={1} mb={1}>
+											<Filter
+												name={filter}
+												colorScheme="blue"
+												onClick={() => {
+													setFilters({ ...filters, [filter]: !active });
+													setNumOfItems(8);
+												}}
+												active={active as boolean}
+											/>
+										</Box>
+									</motion.div>
+								))}
+							</AnimatePresence>
 						</Flex>
 					</Flex>
 				)}
@@ -138,7 +159,7 @@ const DownloadableTorrents: React.FC<DownloadableTorrentsProps> = ({ title, movi
 									isDisabled={response.loading || clickedTorrent === torrentName}
 									isLoading={clickedTorrent === torrentName && response.loading}
 									onClick={() => {
-										downloadTorrent({ variables: { movieId, title, torrentName, downloadLink, type: "movie" } }).catch((e) => console.error(e));
+										downloadTorrent({ variables: { title, torrentName, downloadLink, type: "movie" } }).catch((e) => console.error(e));
 										setTorrent(torrentName);
 									}}
 									torrent={{ title: torrentName, type, files, size, downloadLink }}

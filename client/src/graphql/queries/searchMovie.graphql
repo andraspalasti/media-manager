@@ -3,7 +3,6 @@ query searchMovie($title: String!) {
 			results {
 				id
 				title
-				overview
 				release_date
 				popularity
 				vote_average

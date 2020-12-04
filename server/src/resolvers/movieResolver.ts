@@ -1,15 +1,27 @@
-import { Arg, Ctx, Resolver } from "type-graphql";
+import { Arg, FieldResolver, Int, Resolver } from "type-graphql";
 import { Query } from "type-graphql/dist/decorators/Query";
-import { Movie } from "../entities/movie";
-import { ContextType } from "../types";
+import { Movie, Movies } from "../entities/movie";
 
-@Resolver(Movie)
+@Resolver(Movies)
 export class MovieResolver {
-	@Query(() => [Movie])
-	async movies(@Arg("completed", () => Boolean, { nullable: true }) completed: Boolean | null, @Ctx() { db }: ContextType) {
-		if (completed) {
-			return await db.getRepository(Movie).find({ where: { completed } });
-		}
-		return await db.getRepository(Movie).find();
+	@Query(() => Movies)
+	async movies(
+		@Arg("completed", () => Boolean, { nullable: true }) completed: boolean | undefined,
+		@Arg("offset", () => Int, { nullable: true }) offset: number | undefined,
+		@Arg("limit", () => Int, { nullable: true }) limit: number | undefined
+	) {
+		return {
+			movies: await Movie.find({
+				where: { ...(completed !== undefined ? { completed: completed } : {}) },
+				order: { addedAt: "DESC" },
+				skip: offset || 0,
+				...(limit ? { take: limit } : {}),
+			}),
+		};
+	}
+
+	@FieldResolver(() => Int, { description: "Number of rows in database" })
+	async length(@Arg("completed", () => Boolean, { nullable: true }) completed: boolean | undefined): Promise<number> {
+		return await Movie.count({ where: { ...(completed !== undefined ? { completed: completed } : {}) } });
 	}
 }

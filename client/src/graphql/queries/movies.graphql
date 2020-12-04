@@ -1,0 +1,12 @@
+query movies($completed: Boolean, $offset: Int, $limit: Int) {
+	movies(completed: $completed, offset: $offset, limit: $limit) {
+		movies {
+			id
+			title
+			addedAt
+			finishedAt
+			size
+		}
+		length (completed: $completed)
+	}
+}
